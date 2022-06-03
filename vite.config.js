@@ -7,6 +7,22 @@ import { fileURLToPath } from 'url';
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
+const renameIndexPlugin = (newFilename) => {
+  if (!newFilename) return
+
+  return {
+    name: 'renameIndex',
+    enforce: 'post',
+    generateBundle(options, bundle) {
+      for(var b in bundle) {
+        if(b.lastIndexOf('index.html') > -1) {
+          bundle[b].fileName = newFilename
+        }
+      }
+    },
+  }
+}
+
 export default defineConfig(({ mode }) => {
   return {
     resolve: {
@@ -35,6 +51,16 @@ export default defineConfig(({ mode }) => {
       },
       ]
     },
+    build: {
+      outDir: dirname,
+      rollupOptions: {
+        root: path.resolve(dirname, 'src'),
+        input: {
+          // http://localhost:3001/src/index.html
+          main: path.resolve(dirname, 'src', 'index.html'),
+        },
+      }
+    },
     plugins: [
       replaceCodePlugin({
         replacements: [
@@ -46,6 +72,7 @@ export default defineConfig(({ mode }) => {
       }),
       vue(),
       splitVendorChunkPlugin(),
+      renameIndexPlugin('index.html'),
     ],
     css: {
       preprocessorOptions: {
