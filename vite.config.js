@@ -1,6 +1,7 @@
 import { defineConfig, splitVendorChunkPlugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { replaceCodePlugin } from "vite-plugin-replace";
+import { createHtmlPlugin } from 'vite-plugin-html'
 import path from 'path';
 import { fileURLToPath } from 'url';
 
