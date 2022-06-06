@@ -22,6 +22,9 @@
   }
 
   .host-name {
+    display: flex;
+    align-items: center;
+    height: .6rem;
     color: white;
     word-break: break-all;
     position: absolute;
@@ -29,7 +32,7 @@
     margin-top: 0.3rem;
     font-size: 0.3rem;
     font-weight: bold;
-    padding: 0.04rem 0.3rem;
+    padding: 0 0.22rem;
     border-radius: 0.2rem;
     background: #ffbf1d;
     text-shadow: 1px 1px 1px hsl(29, 100%, 16%);

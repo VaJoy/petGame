@@ -3,7 +3,7 @@
     <div class="pet-wrap">
       <component :is="petComponent"></component>
     </div>
-    <div class="host-name">{{pet.host.name}}</div>
+    <div class="host-name">{{pet.host.name}} (Lv. {{pet.level}})</div>
   </div>
 </template>
 
@@ -38,11 +38,13 @@ const setPetComponent = (type) => {
 export default {
   components: { NoPet, Cat1, Dog1, Rabbit1 },
   props: ['pet', 'hasLogined', 'permission'],
+  computed: {
+    petComponent() {
+      return setPetComponent(this.pet.type)
+    }
+  },
   setup(props) {
-    const petComponent = setPetComponent(props.pet.type);
-
     return {
-      petComponent
     }
   },
 }

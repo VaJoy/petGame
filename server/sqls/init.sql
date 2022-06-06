@@ -1,0 +1,48 @@
+USE petgame;
+
+CREATE TABLE IF NOT EXISTS `users`(
+   `id` INT UNSIGNED AUTO_INCREMENT,
+   `name` VARCHAR(60) NOT NULL,
+   `session_id` VARCHAR(100),
+   `password` VARCHAR(100),
+   `coin` INT UNSIGNED NOT NULL,
+   `last_visit_time` INT UNSIGNED,
+   PRIMARY KEY ( `id` )
+);
+
+CREATE TABLE IF NOT EXISTS `props`(
+   `id` INT UNSIGNED AUTO_INCREMENT,
+   `type` TINYINT(1) UNSIGNED NOT NULL,
+   `user_id` INT UNSIGNED NOT NULL,
+   PRIMARY KEY ( `id` )
+);
+
+CREATE TABLE IF NOT EXISTS `pets`(
+   `id` INT UNSIGNED AUTO_INCREMENT,
+   `type` TINYINT(1) UNSIGNED NOT NULL,
+   `user_id` INT UNSIGNED NOT NULL,
+   `force` INT UNSIGNED NOT NULL,
+   `defence` INT UNSIGNED NOT NULL,
+   `agility` INT UNSIGNED NOT NULL,
+   `exp` INT UNSIGNED NOT NULL,
+   `sign_exp` INT UNSIGNED NOT NULL,
+   PRIMARY KEY ( `id` )
+);
+
+CREATE TABLE IF NOT EXISTS `events`(
+   `id` INT UNSIGNED AUTO_INCREMENT,
+   `type` TINYINT(1) UNSIGNED NOT NULL,
+   `user_id` INT UNSIGNED NOT NULL,
+   `target_id` INT UNSIGNED,
+   `time` INT UNSIGNED NOT NULL,
+   `success` TINYINT(1) UNSIGNED NOT NULL,
+   PRIMARY KEY ( `id` )
+);
+
+CREATE TABLE IF NOT EXISTS `awards`(
+   `id` INT UNSIGNED AUTO_INCREMENT,
+   `num` INT UNSIGNED NOT NULL,
+   `name` VARCHAR(60) NOT NULL,
+   `event_id` INT UNSIGNED NOT NULL,
+   PRIMARY KEY ( `id` )
+);
