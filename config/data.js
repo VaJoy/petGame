@@ -11,6 +11,61 @@ export const eventType = {
     enhance: 3,  // 喝药水增强
 }
 
+const levels = [
+    { level: 1, exp: 10 },
+    { level: 2, exp: 20 },
+    { level: 3, exp: 40 },
+    { level: 4, exp: 60 },
+    { level: 5, exp: 80 },
+    { level: 6, exp: 100 },
+    { level: 7, exp: 120 },
+    { level: 8, exp: 140 },
+    { level: 9, exp: 160 },
+    { level: 10, exp: 180 },
+    { level: 11, exp: 220 },
+    { level: 12, exp: 260 },
+    { level: 13, exp: 300 },
+    { level: 14, exp: 340 },
+    { level: 15, exp: 380 },
+    { level: 16, exp: 420 },
+    { level: 17, exp: 460 },
+    { level: 18, exp: 500 },
+    { level: 19, exp: 540 },
+    { level: 20, exp: 600 },
+];
+
+export function getLevel(exp = 0) {
+    let level = 0;
+    for(let i = 0, item; item = levels[i]; i++) {
+        if(exp >= item.exp) {
+            level = item.level;
+        } else {
+            break;
+        }
+    }
+
+    return level
+}
+
+export function getPetStage(level = 0) {
+    let stage = 1;
+    if (level >= 1) {
+        stage = 2;  // 破蛋宝宝
+    }
+    if (level >= 5) {
+        stage = 3;  // 婴儿宝宝
+    }
+    if (level >= 10) {
+        stage = 4;  // 少年宝宝
+    }
+    if (level >= 15) {
+        stage = 5;  // 成年宝宝
+    }
+
+    return stage
+}
+
+// mock data belows
 export const initData = {
     time: Date.now(),
     id: 1,  // 0 为未登录

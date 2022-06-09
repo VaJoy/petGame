@@ -1,4 +1,5 @@
-import { initData } from '@mock/data.js'
+import { initData } from '@config/data.js';
+import { request } from '@js/request.js';
 
 const getMockData = () => {
     return new Promise((resolve) => {
@@ -6,5 +7,10 @@ const getMockData = () => {
     })
 }
 
-export const getInitData = __IS_DEV__ ? getMockData : getMockData;
+export const getInitData = (callback) => {
+    request('get-init-data', {}, callback);
+}
 
+export const login = (data, callback) => {
+    request('login', data, callback);
+}

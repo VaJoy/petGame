@@ -43,8 +43,8 @@ export default defineConfig(({ mode }) => {
         replacement: path.resolve(dirname, 'src/components')
       },
       {
-        find: '@mock',
-        replacement: path.resolve(dirname, 'src/mock')
+        find: '@config',
+        replacement: path.resolve(dirname, 'config')
       },
       {
         find: '@js',

@@ -1,19 +1,34 @@
 import express from 'express';
 import session from 'express-session';
 import sessionFileStore from 'session-file-store';
-import { codes } from './config/codes.js';
+import rateLimit from 'express-rate-limit'
+import { codes } from '../config/codes.js';
 import { login, modifyPassword, getInitData, initEgg } from './query.js';
 import cors from 'cors';
+import bodyParser from 'body-parser'
 
 const FileStore = sessionFileStore(session);
 const app = express();
 const identityKey = 'studyroom2022';
+
+
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json());
 
 app.use(cors({
     origin: [/http\:\/\/localhost\:\d+$/, /\.github\.io$/],
     credentials: true,  // Access-Control-Allow-Credentials
     optionsSuccessStatus: 200
 }));
+
+const limiter = rateLimit({
+	windowMs: 60 * 1000,
+	max: 30,
+	standardHeaders: true,
+	legacyHeaders: false,
+});
+
+app.use(limiter)
 
 app.use(session({
     name: identityKey,
@@ -31,13 +46,13 @@ app.get('/', function (req, res, next) {
     res.send(`<p>${id}</p>`);
 });
 
-app.get('/login', function (req, res, next) {
+app.post('/login', function (req, res, next) {
     login(req, (json) => {
         res.json(json);
     })
 });
 
-app.get('/logout', function (req, res, next) {
+app.post('/logout', function (req, res, next) {
     req.session.destroy(function (err) {
         const json = {
             err,
@@ -47,19 +62,19 @@ app.get('/logout', function (req, res, next) {
     });
 });
 
-app.get('/modify-password', function (req, res, next) {
+app.post('/modify-password', function (req, res, next) {
     modifyPassword(req, (json) => {
         res.json(json);
     })
 });
 
-app.get('/get-init-data', function (req, res, next) {
+app.post('/get-init-data', function (req, res) {
     getInitData(req, (json) => {
         res.json(json);
     })
 });
 
-app.get('/init-egg', function (req, res) {
+app.post('/init-egg', function (req, res) {
     initEgg(req, (json) => {
         res.json(json);
     })

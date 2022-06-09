@@ -3,36 +3,38 @@
     <div class="pet-wrap">
       <component :is="petComponent"></component>
     </div>
-    <div class="host-name">{{pet.host.name}} (Lv. {{pet.level}})</div>
+    <div class="host-name">{{pet.name}} (Lv. {{level}})</div>
   </div>
 </template>
 
 <script>
-import { shallowReactive } from 'vue';
+import { shallowReactive, ref } from 'vue';
 import Cat1 from '@components/cat/Cat1.vue'
 import Dog1 from '@components/dog/Dog1.vue'
 import Rabbit1 from '@components/rabbit/Rabbit1.vue'
 import NoPet from '@components/no-pet/NoPet.vue'
-import { petType } from '@mock/data.js'
+import { petType, getLevel, getPetStage } from '@config/data.js'
 
-const setPetComponent = (type) => {
+
+const setPetComponent = (type, level) => {
   let curCom;
+  let stage = getPetStage(level);
   switch (type) {
     case petType.cat:
-      curCom = Cat1;
+      curCom = 'Cat' + stage;
       break;
     case petType.dog:
-      curCom = Dog1;
+      curCom = 'Dog' + stage;
       break;
     case petType.rabbit:
-      curCom = Rabbit1;
+      curCom = 'Rabbit' + stage;
       break;
     default:
-      curCom = NoPet;
+      curCom = 'NoPet';
       break;
   }
 
-  return curCom;
+  return eval(curCom);
 }
 
 export default {
@@ -40,11 +42,12 @@ export default {
   props: ['pet', 'hasLogined', 'permission'],
   computed: {
     petComponent() {
-      return setPetComponent(this.pet.type)
+      return setPetComponent(this.pet.type, this.level)
     }
   },
   setup(props) {
     return {
+      level: getLevel(props.pet.total_exp)
     }
   },
 }

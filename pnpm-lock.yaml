@@ -3,12 +3,14 @@ lockfileVersion: 5.3
 specifiers:
   '@vitejs/plugin-vue': ^2.3.3
   sass: ^1.52.1
+  tiny-emitter: ^2.1.0
   vite: ^2.9.9
   vite-plugin-html: ^3.2.0
   vite-plugin-replace: ^0.1.1
   vue: ^3.2.25
 
 dependencies:
+  tiny-emitter: 2.1.0
   vue: 3.2.36
 
 devDependencies:
@@ -955,6 +957,10 @@ packages:
       commander: 2.20.3
       source-map-support: 0.5.21
     dev: true
+
+  /tiny-emitter/2.1.0:
+    resolution: {integrity: sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==}
+    dev: false
 
   /to-regex-range/5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}

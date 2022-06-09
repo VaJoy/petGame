@@ -1,8 +1,8 @@
 import mysql from 'mysql';
-import password from './password.js';
-import { codes } from './config/codes.js';
+import { password } from './secret.js';
+import { codes } from '../config/codes.js';
 import { errorHandler, cryptPassword, arrangePet } from './util.js';
-import { petType } from '../src/mock/data.js';
+import { petType } from '../config/data.js';
 
 
 const connection = mysql.createConnection({
@@ -15,11 +15,12 @@ const connection = mysql.createConnection({
 connection.connect();
 
 export function checkLogin(req, next) {
-    connection.query(`SELECT * where session_id="${req.session.id}" and id=${req.session.user_id}`, function (error, results) {
+    connection.query(`SELECT * from users where session_id="${req.session.id}" and id=${req.session.user_id}`, function (error, results) {
         if (!error && results?.length) {
             next();
         } else {
-            next('你没有权限操作，请重新登录')
+            next('你没有权限操作，请重新登录');
+            req.session.destroy(() => {});
         }
     });
 }
@@ -31,9 +32,7 @@ export function initEgg(req, callback) {
         }
 
         const { type = petType.rabbit } = req.body || {};
-
-        connection.query(`INSERT INTO pets (type, user_id, force, defence, agility, exp, sign_exp)
-        VALUES (${type}, ${req.session.user_id}, 10, 10, 10, 0, 0)`, function (err) {
+        connection.query(`INSERT INTO pets (type, user_id, \`force\`, defence, agility, exp, sign_exp) VALUES (${type}, ${req.session.user_id}, 10, 10, 10, 0, 0)`, function (err) {
             if (errorHandler(err, 'sqlNativeError', callback)) {
                 return;
             }
@@ -61,7 +60,7 @@ export function getInitData(req, callback) {
 
     const getPets = new Promise((resolve, reject) => {
         connection.query(`SELECT a.user_id, a.type, a.force, a.defence, a.agility, (a.exp + a.sign_exp) as total_exp, b.name, b.coin 
-        from pets a left join users b on b.id = a.user_id order by a.total_exp DESC`, function (error, results) {
+        from pets a left join users b on b.id = a.user_id order by total_exp DESC`, function (error, results) {
             if (error) {
                 return reject(error);
             }
@@ -103,8 +102,9 @@ export function getInitData(req, callback) {
     }
 
     Promise.all(queryList).then(([pets = [], events = [], userInfo = [], myEvents = [], myProps = []]) => {
+        const time = Date.now();
         let result = {
-            time: Date.now(),
+            time,
             code: codes.ok,
             pets,
             events
@@ -114,6 +114,10 @@ export function getInitData(req, callback) {
             result = Object.assign(result, { myInfo: userInfo[0], myEvents, myProps });
             // 把自己的宠物提升到第一位，并加上 isMine 字段
             result.pets = arrangePet(pets, user_id);
+
+            setTimeout(() => {  // 更新用户访问时间
+                connection.query(`UPDATE users SET last_visit_time=${time} where id=${user_id}`, function (err) {});
+            }, 0);
         }
 
         callback(result);
@@ -165,8 +169,9 @@ export function login(req, callback) {
 }
 
 export function modifyPassword(req, callback) {
-    const { id = 0, oldPassword = '', newPassword = '' } = (req.body || {});
-    connection.query(`SELECT password from users where id=${id}`, function (error, results, fields) {
+    const { id = 0, password = '', newPassword = '' } = (req.body || {});
+
+    connection.query(`SELECT password from users where id=${id}`, function (error, results) {
         if (errorHandler(error, 'sqlNativeError', callback)) {
             return;
         }
@@ -175,7 +180,7 @@ export function modifyPassword(req, callback) {
             return errorHandler('找不到该用户', callback);
         }
 
-        const isValid = (results[0].password || '') === cryptPassword(oldPassword);
+        const isValid = (results[0].password || '') === cryptPassword(password);
         if (!isValid) {
             return errorHandler('密码错误，若忘记密码请找 VJ 处理', callback);
         }

@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `users`(
    `session_id` VARCHAR(100),
    `password` VARCHAR(100),
    `coin` INT UNSIGNED NOT NULL,
-   `last_visit_time` INT UNSIGNED,
+   `last_visit_time` BIGINT UNSIGNED,
    PRIMARY KEY ( `id` )
 );
 
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `events`(
    `type` TINYINT(1) UNSIGNED NOT NULL,
    `user_id` INT UNSIGNED NOT NULL,
    `target_id` INT UNSIGNED,
-   `time` INT UNSIGNED NOT NULL,
+   `time` BIGINT UNSIGNED NOT NULL,
    `success` TINYINT(1) UNSIGNED NOT NULL,
    PRIMARY KEY ( `id` )
 );
