@@ -46,3 +46,8 @@ export function arrangePet(pets, user_id) {
 
     return pets
 }
+
+export function sqlFilter(sqlStr = '') {
+    sqlStr = sqlStr.replace(/[`"'\s]/g, '');
+    return sqlStr.trim()
+}

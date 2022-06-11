@@ -3,7 +3,7 @@ import session from 'express-session';
 import sessionFileStore from 'session-file-store';
 import rateLimit from 'express-rate-limit'
 import { codes } from '../config/codes.js';
-import { login, modifyPassword, getInitData, initEgg } from './query.js';
+import { login, modifyPassword, getInitData, initEgg, reward } from './query.js';
 import cors from 'cors';
 import bodyParser from 'body-parser'
 
@@ -80,5 +80,10 @@ app.post('/init-egg', function (req, res) {
     })
 });
 
+app.get('/reward', function (req, res) {
+    reward(req, (json) => {
+        res.json(json);
+    })
+});
 
 app.listen(2022);
