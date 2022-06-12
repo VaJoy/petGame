@@ -62,7 +62,7 @@ export default {
       timeStamp = setInterval(() => {
         restTime = restTime.subtract(1, 'seconds');
         this.restTime = restTime.format("HH:mm:ss");
-        if (this.restTime === '00:59:50') {
+        if (this.restTime === '00:00:00') {
           endWorking((json) => {
             if (json.code === codes.ok) {
               localStorage.setItem('last-work-date', moment().format('yyyy-MM-DD'));

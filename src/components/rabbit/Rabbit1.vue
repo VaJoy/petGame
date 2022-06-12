@@ -9,7 +9,7 @@
 
 <script>
 import { shallowReactive } from 'vue';
-import { createjs, AdobeAn } from './js/canvas';
+import { createjs, AdobeAn } from './js/rabbit1';
 
 let stage, exportRoot, fnStartAnimation;
 

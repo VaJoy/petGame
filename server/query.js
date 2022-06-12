@@ -18,7 +18,7 @@ let rewardTimestamp;
 connection.connect();
 
 export function checkLogin(req, needAdmin, next) {
-    connection.query(`SELECT * from users where session_id="${sqlFilter(req.session.id)}" and id=${needAdmin ? adminId : req.session.user_id|0}`,
+    connection.query(`SELECT * from users where session_id="${sqlFilter(req.session.id)}" and id=${needAdmin ? adminId : req.session.user_id | 0}`,
         function (error, results) {
             if (!error && results?.length) {
                 next();
@@ -31,7 +31,7 @@ export function checkLogin(req, needAdmin, next) {
 
 export function endWorking(req, callback) {
     const { session } = req;
-    const userId = session.user_id|0;
+    const userId = session.user_id | 0;
     const today = moment().format('yyyy-MM-DD');
     checkLogin(req, false, (error) => {
         if (errorHandler(error, 'limitedAccess', callback)) {
@@ -39,41 +39,41 @@ export function endWorking(req, callback) {
         }
 
         connection.query(`SELECT id,c_time,c_date,success from events where user_id=${userId} and type=${eventType.startWorking} order by c_time desc limit 1;SELECT id,c_time,c_date,success from events where user_id=${userId} and type=${eventType.startWorking} and success=1 order by c_time desc limit 1`,
-        function (error, list) {
-            if (errorHandler(error, 'sqlNativeError', callback)) {
-                return;
-            }
-    
-            const results = (list[0] || []).concat(list[1]);
+            function (error, list) {
+                if (errorHandler(error, 'sqlNativeError', callback)) {
+                    return;
+                }
 
-            if (!results?.length) {
-                return errorHandler('未找到打工记录', callback);
-            }
+                const results = (list[0] || []).concat(list[1]);
 
-            const { c_time, success, id } = results[0];
+                if (!results?.length) {
+                    return errorHandler('未找到打工记录', callback);
+                }
 
-            if (success === 1) {
-                return errorHandler('错误操作，你的宝宝未开始打工', callback);
-            }
+                const { c_time, success, id } = results[0];
 
-            if (results[1] && results[1].c_date === today) {
-                return errorHandler('你的宝宝今天已经打工过了，无法再获得奖励', callback);
-            }
+                if (success === 1) {
+                    return errorHandler('错误操作，你的宝宝未开始打工', callback);
+                }
 
-            const timeSpan = Date.now() - (c_time + 3600000);
-            if (Math.abs(timeSpan) <= 60000 * 2) {
-                connection.query(`update users set coin=(coin+10) where id=${userId}; update events set success=1 where id=${id}`, 
-                (err) => {
-                    if (!errorHandler(err, 'sqlNativeError', callback)) {
-                        callback({
-                            code: codes.ok
-                        })
-                    }
-                });
-            } else {
-                return errorHandler('打工时间异常，请联系 VJ', callback);
-            }
-        });
+                if (results[1] && results[1].c_date === today) {
+                    return errorHandler('你的宝宝今天已经打工过了，无法再获得奖励', callback);
+                }
+
+                const timeSpan = Date.now() - (c_time + 3600000);
+                if (Math.abs(timeSpan) <= 60000 * 2) {
+                    connection.query(`update users set coin=(coin+10) where id=${userId}; update events set success=1 where id=${id}`,
+                        (err) => {
+                            if (!errorHandler(err, 'sqlNativeError', callback)) {
+                                callback({
+                                    code: codes.ok
+                                })
+                            }
+                        });
+                } else {
+                    return errorHandler('打工时间异常，请联系 VJ', callback);
+                }
+            });
     });
 }
 
@@ -92,57 +92,70 @@ export function markEvent(req, callback) {
 
         const today = moment().format('yyyy-MM-DD');
         connection.query(`INSERT INTO events (type, user_id, c_time, c_date, success, target_id) 
-        VALUES (${type}, ${session.user_id|0}, ${Date.now()}, '${today}', ${type === eventType.startWorking ? 0 : 1}, ${sqlFilter(target) || 'null'})`, 
-        function (err) {
-            if (errorHandler(err, 'sqlNativeError', callback)) {
-                return;
-            }
+        VALUES (${type}, ${session.user_id | 0}, ${Date.now()}, '${today}', ${type === eventType.startWorking ? 0 : 1}, ${sqlFilter(target) || 'null'})`,
+            function (err) {
+                if (errorHandler(err, 'sqlNativeError', callback)) {
+                    return;
+                }
 
-            callback({
-                code: codes.ok
-            })
-        });
+                callback({
+                    code: codes.ok
+                })
+            });
     });
 }
 
 export function reward(req, callback) {
     const { query } = req;
-    checkLogin(req, true, (error) => {
-        if (errorHandler(error, 'limitedAccess', callback)) {
-            return;
-        }
-
-        connection.beginTransaction(function(err) {
-            if (err) {
-                return errorHandler(err, 'rewardOpError', callback);
+    const { top1 = [], top2 = [], top3 = [], score100 = [], sign = [], isImmediate } = JSON.parse(query.data);
+    const handler = () => {
+        checkLogin(req, true, (error) => {
+            if (errorHandler(error, 'limitedAccess', callback)) {
+                return;
             }
 
-            const { top1=[], top2=[], top3=[], score100=[], sign=[] } = JSON.parse(query.data);
-            const promises = [];
+            connection.beginTransaction(function (err) {
+                if (err) {
+                    return errorHandler(err, 'rewardOpError', callback);
+                }
 
-            top1.forEach((id) => {
-                promises.push(getRewardPromise(id, 1));
-            });
-            top2.forEach((id) => {
-                promises.push(getRewardPromise(id, 2));
-            });
-            top3.forEach((id) => {
-                promises.push(getRewardPromise(id, 3));
-            });
-            score100.forEach((id) => {
-                promises.push(getRewardPromise(id, 4));
-            });
-            sign.forEach((item) => {
-                promises.push(addRewards(item.id, { signExp: item.signExp }));
-            });
-            
-            Promise.all(promises).then(() => {
-                callback({ code: codes.ok })
-            }).catch(err => {
-                errorHandler(err, callback);
+
+                const promises = [];
+
+                top1.forEach((id) => {
+                    promises.push(getRewardPromise(id, 1));
+                });
+                top2.forEach((id) => {
+                    promises.push(getRewardPromise(id, 2));
+                });
+                top3.forEach((id) => {
+                    promises.push(getRewardPromise(id, 3));
+                });
+                score100.forEach((id) => {
+                    promises.push(getRewardPromise(id, 4));
+                });
+                sign.forEach((item) => {
+                    promises.push(addRewards(item.id, { signExp: item.signExp }));
+                });
+
+                Promise.all(promises).then(() => {
+                    callback({ code: codes.ok })
+                }).catch(err => {
+                    errorHandler(err, callback);
+                })
             })
+        });
+    }
+
+    if (isImmediate) {
+        handler()
+    } else {
+        rewardTimestamp = setInterval(() => {
+            Timeout
+        }, interval);(() => {
+
         })
-    })
+    }
 }
 
 function getRewardPromise(id, level) {
@@ -207,7 +220,7 @@ export function initEgg(req, callback) {
 
         const { type = petType.rabbit } = req.body || {};
         connection.query(`INSERT INTO pets (type, user_id, \`force\`, defence, agility, exp, sign_exp) 
-        VALUES (${type}, ${req.session.user_id|0}, 10, 10, 10, 0, 0)`, function (err) {
+        VALUES (${type}, ${req.session.user_id | 0}, 10, 10, 10, 0, 0)`, function (err) {
             if (errorHandler(err, 'sqlNativeError', callback)) {
                 return;
             }
@@ -224,7 +237,7 @@ export function getInitData(req, callback) {
 
     const getUserInfo = new Promise((resolve, reject) => {
         connection.query(`SELECT id, name, coin, last_visit_time from users 
-        where session_id="${sqlFilter(session_id)}" and id=${user_id|0}`, function (error, results) {
+        where session_id="${sqlFilter(session_id)}" and id=${user_id | 0}`, function (error, results) {
             if (error) {
                 return reject(error);
             }
@@ -245,7 +258,7 @@ export function getInitData(req, callback) {
     });
 
     const getEvents = new Promise((resolve, reject) => {
-        connection.query(`SELECT * from events order by time DESC LIMIT 10`, function (error, results) {
+        connection.query(`SELECT * from events order by c_time DESC LIMIT 10`, function (error, results) {
             if (error) {
                 return reject(error);
             }
@@ -254,17 +267,17 @@ export function getInitData(req, callback) {
     });
 
     const getMyEvents = new Promise((resolve, reject) => {
-        connection.query(`SELECT * from events where user_id=${user_id|0} or target_id=${user_id|0} order by time DESC LIMIT 10`, 
-        function (error, results, fields) {
-            if (error) {
-                return reject(error);
-            }
-            resolve(results)
-        });
+        connection.query(`SELECT * from events where user_id=${user_id | 0} or target_id=${user_id | 0} order by c_time DESC LIMIT 10`,
+            function (error, results, fields) {
+                if (error) {
+                    return reject(error);
+                }
+                resolve(results)
+            });
     });
 
     const getMyProps = new Promise((resolve, reject) => {
-        connection.query(`SELECT * from props where user_id=${user_id|0}`, function (error, results) {
+        connection.query(`SELECT * from props where user_id=${user_id | 0}`, function (error, results) {
             if (error) {
                 return reject(error);
             }
@@ -292,7 +305,7 @@ export function getInitData(req, callback) {
             result.pets = arrangePet(pets, user_id);
 
             setTimeout(() => {  // 更新用户访问时间
-                connection.query(`UPDATE users SET last_visit_time=${time} where id=${user_id|0}`, function (err) { });
+                connection.query(`UPDATE users SET last_visit_time=${time} where id=${user_id | 0}`, function (err) { });
             }, 0);
         }
 
@@ -305,7 +318,7 @@ export function getInitData(req, callback) {
 export function login(req, callback) {
     const { body = {}, session } = req;
     const id = body.id || 0;
-    connection.query(`SELECT password from users where id=${id|0}`, function (error, results, fields) {
+    connection.query(`SELECT password from users where id=${id | 0}`, function (error, results, fields) {
         if (errorHandler(error, 'sqlNativeError', callback)) {
             return;
         }
@@ -347,7 +360,7 @@ export function login(req, callback) {
 export function modifyPassword(req, callback) {
     const { id = 0, password = '', newPassword = '' } = (req.body || {});
 
-    connection.query(`SELECT password from users where id=${id|0}`, function (error, results) {
+    connection.query(`SELECT password from users where id=${id | 0}`, function (error, results) {
         if (errorHandler(error, 'sqlNativeError', callback)) {
             return;
         }
@@ -366,7 +379,7 @@ export function modifyPassword(req, callback) {
                 return;
             }
 
-            connection.query(`UPDATE users SET session_id="${req.session.id|0}",
+            connection.query(`UPDATE users SET session_id="${req.session.id | 0}",
             password="${cryptPassword(newPassword) || ''}" where id=${id}`, function (err) {
                 if (errorHandler(err, 'sqlNativeError', callback)) {
                     return;

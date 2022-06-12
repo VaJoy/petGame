@@ -10,9 +10,9 @@ export const request = (function () {
         emitter.emit('request/loading', state);
     }
 
-    return (route, body = {}, callback) => {
+    return (route, body = {}, callback, silent) => {
         if (requestRecord[route]) return;
-        toggleState(route, true);
+        silent || toggleState(route, true);
 
         fetch(`${url}/${route}`, {
             credentials: "include",
@@ -48,8 +48,8 @@ export const request = (function () {
 })();
 
 
-export const getInitData = (callback) => {
-    request('get-init-data', {}, callback);
+export const getInitData = (callback, silent) => {
+    request('get-init-data', {}, callback, silent);
 }
 
 export const login = (data, callback) => {

@@ -9,7 +9,7 @@
 
 <script>
 import { shallowReactive } from 'vue';
-import { createjs, AdobeAn } from './js/dog1';
+import { createjs, AdobeAn } from './js/dog2';
 
 let stage, exportRoot, fnStartAnimation;
 
@@ -22,7 +22,7 @@ function handleComplete(canvasElm, comp) {
   //This function is always called, irrespective of the content. You can use the variable "stage" after it is created in token create_stage.
   var lib = comp.getLibrary();
   var ss = comp.getSpriteSheet();
-  exportRoot = new lib.dog();
+  exportRoot = new lib.dog2();
   stage = new lib.Stage(canvasElm);
   //Registers the "tick" event listener.
   fnStartAnimation = function () {

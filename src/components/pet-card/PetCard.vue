@@ -21,6 +21,8 @@ import { shallowReactive, ref } from 'vue';
 import Cat1 from '@components/cat/Cat1.vue'
 import Dog1 from '@components/dog/Dog1.vue'
 import Rabbit1 from '@components/rabbit/Rabbit1.vue'
+import Dog2 from '@components/dog/Dog2.vue'
+import Rabbit2 from '@components/rabbit/Rabbit2.vue'
 import NoPet from '@components/no-pet/NoPet.vue'
 import { petType, getLevel, getPetStage } from '@config/data.js'
 import emitter from 'tiny-emitter/instance';
@@ -28,10 +30,10 @@ import emitter from 'tiny-emitter/instance';
 const setPetComponent = (type, level) => {
   let curCom;
   let stage = getPetStage(level);
-  stage = 1;
+  stage = stage > 1 ? 2 : 1;
   switch (type) {
     case petType.cat:
-      curCom = 'Cat' + stage;
+      curCom = 'Cat' + 1;
       break;
     case petType.dog:
       curCom = 'Dog' + stage;
@@ -48,7 +50,7 @@ const setPetComponent = (type, level) => {
 }
 
 export default {
-  components: { NoPet, Cat1, Dog1, Rabbit1 },
+  components: { NoPet, Cat1, Dog1, Rabbit1, Dog2, Rabbit2 },
   props: ['pet', 'hasLogined', 'permission'],
   computed: {
     petComponent() {
