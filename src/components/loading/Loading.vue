@@ -52,19 +52,11 @@ export default {
 
 <style lang="sass" scoped>
   .mask-bg
-    z-index: 9999
-    position: fixed
-    left: 0
-    right: 0
-    bottom: 0
-    top: 0
-    background: rgba(0,0,0,.3)
     display: flex
     align-items: center
     justify-content: center
   canvas
     width: 200px
     height: 90px
-    z-index: 9999
     
 </style>

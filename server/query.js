@@ -2,8 +2,8 @@ import mysql from 'mysql';
 import { password, adminId } from './secret.js';
 import { codes } from '../config/codes.js';
 import { errorHandler, cryptPassword, arrangePet, sqlFilter } from './util.js';
-import { petType, rewardsMap } from '../config/data.js';
-
+import { petType, rewardsMap, eventType } from '../config/data.js';
+import moment from 'moment';
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -17,8 +17,8 @@ let rewardTimestamp;
 
 connection.connect();
 
-export function checkLogin(req, isAdmin, next) {
-    connection.query(`SELECT * from users where session_id="${sqlFilter(req.session.id)}" and id=${isAdmin ? adminId : req.session.user_id|0}`,
+export function checkLogin(req, needAdmin, next) {
+    connection.query(`SELECT * from users where session_id="${sqlFilter(req.session.id)}" and id=${needAdmin ? adminId : req.session.user_id|0}`,
         function (error, results) {
             if (!error && results?.length) {
                 next();
@@ -29,6 +29,82 @@ export function checkLogin(req, isAdmin, next) {
         });
 }
 
+export function endWorking(req, callback) {
+    const { session } = req;
+    const userId = session.user_id|0;
+    const today = moment().format('yyyy-MM-DD');
+    checkLogin(req, false, (error) => {
+        if (errorHandler(error, 'limitedAccess', callback)) {
+            return;
+        }
+
+        connection.query(`SELECT id,c_time,c_date,success from events where user_id=${userId} and type=${eventType.startWorking} order by c_time desc limit 1;SELECT id,c_time,c_date,success from events where user_id=${userId} and type=${eventType.startWorking} and success=1 order by c_time desc limit 1`,
+        function (error, list) {
+            if (errorHandler(error, 'sqlNativeError', callback)) {
+                return;
+            }
+    
+            const results = (list[0] || []).concat(list[1]);
+
+            if (!results?.length) {
+                return errorHandler('未找到打工记录', callback);
+            }
+
+            const { c_time, success, id } = results[0];
+
+            if (success === 1) {
+                return errorHandler('错误操作，你的宝宝未开始打工', callback);
+            }
+
+            if (results[1] && results[1].c_date === today) {
+                return errorHandler('你的宝宝今天已经打工过了，无法再获得奖励', callback);
+            }
+
+            const timeSpan = Date.now() - (c_time + 3600000);
+            if (Math.abs(timeSpan) <= 60000 * 2) {
+                connection.query(`update users set coin=(coin+10) where id=${userId}; update events set success=1 where id=${id}`, 
+                (err) => {
+                    if (!errorHandler(err, 'sqlNativeError', callback)) {
+                        callback({
+                            code: codes.ok
+                        })
+                    }
+                });
+            } else {
+                return errorHandler('打工时间异常，请联系 VJ', callback);
+            }
+        });
+    });
+}
+
+export function markEvent(req, callback) {
+    const { body, session } = req;
+    checkLogin(req, false, (error) => {
+        if (errorHandler(error, 'limitedAccess', callback)) {
+            return;
+        }
+
+        const { target } = body || {};
+        const type = eventType[body.type];
+        if (!type) {
+            return errorHandler('参数错误', callback)
+        }
+
+        const today = moment().format('yyyy-MM-DD');
+        connection.query(`INSERT INTO events (type, user_id, c_time, c_date, success, target_id) 
+        VALUES (${type}, ${session.user_id|0}, ${Date.now()}, '${today}', ${type === eventType.startWorking ? 0 : 1}, ${sqlFilter(target) || 'null'})`, 
+        function (err) {
+            if (errorHandler(err, 'sqlNativeError', callback)) {
+                return;
+            }
+
+            callback({
+                code: codes.ok
+            })
+        });
+    });
+}
+
 export function reward(req, callback) {
     const { query } = req;
     checkLogin(req, true, (error) => {
@@ -36,7 +112,11 @@ export function reward(req, callback) {
             return;
         }
 
-        try {
+        connection.beginTransaction(function(err) {
+            if (err) {
+                return errorHandler(err, 'rewardOpError', callback);
+            }
+
             const { top1=[], top2=[], top3=[], score100=[], sign=[] } = JSON.parse(query.data);
             const promises = [];
 
@@ -61,9 +141,7 @@ export function reward(req, callback) {
             }).catch(err => {
                 errorHandler(err, callback);
             })
-        } catch (err) {
-            errorHandler(err, 'rewardOpError', callback)
-        }
+        })
     })
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <canvas
+  <canvas class="pet-canvas"
         ref="canvas"
         width="400"
         height="500"

@@ -1,11 +1,11 @@
 <template>
   <div class="mask-bg"></div>
-  <div class="choose-pet-wrap">
+  <div class="choose-pet-wrap dialog-base">
     <h1>请选择你的宝宝</h1>
     <p><input v-model="picked" type="radio" value="1" id="cat"><label for="cat">猫咪</label></p>
     <p><input v-model="picked" type="radio" value="2" id="rabbit"><label for="rabbit">兔子</label></p>
     <p><input v-model="picked" type="radio" value="3" id="dog"><label for="dog">柯基</label></p>
-    <p class="login-btn" @click="getMyPet">获取宠物蛋</p>
+    <p class="button" @click="getMyPet">获取宠物蛋</p>
   </div>
 </template>
 
@@ -38,21 +38,9 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .mask-bg
-    z-index: 999
-    position: fixed
-    left: 0
-    right: 0
-    bottom: 0
-    top: 0
-    background: rgba(0,0,0,.3)
   div.choose-pet-wrap
     z-index: 999
     position: absolute
-    backdrop-filter: blur(12px)
-    background: rgba(255,255,255,.6)
-    border: solid 1px #F1845F
-    border-radius: 3%
     padding: .4rem 1rem
     left: 50%
     top: 50%
@@ -86,16 +74,6 @@ export default {
       font-size: .14rem
       margin-top: .2rem
       color: gray
-    .login-btn
+    .button
       margin-top: .4rem
-      background: #F1845F
-      padding: .2rem .5rem
-      border-radius: .2rem
-      font-size: .25rem
-      font-weight: bold
-      color: #FFFCBB
-      cursor: pointer
-      transition: background .3s
-      &:hover
-        background: #EC4B15
 </style>

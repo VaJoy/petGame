@@ -1,0 +1,24 @@
+.rank-plane-wrap {
+  width: 13rem;
+  padding: .5rem;
+
+  h1 {
+    color: #F1845F;
+    font-size: .6rem;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  p {
+    margin-top: .3rem;
+    font-size: .3rem;
+    line-height: 2;
+    text-align: center;
+  }
+
+  .button {
+    cursor: pointer;
+    display: inline-block;
+    margin-top: .5rem;
+  }
+}

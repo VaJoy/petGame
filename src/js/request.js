@@ -24,15 +24,18 @@ export const request = (function () {
             }
         })
             .then((response) => {
-                toggleState(route, false);
-
                 if (response.ok) {
                     return response.json();
                 }
                 throw new Error('请求失败');
             })
             .then((data) => {
-                callback(data)
+                toggleState(route, false);
+                if (typeof data.err === 'object') {
+                    data.err = JSON.stringify(data.err);
+                }
+                
+                callback(data);
             })
             .catch((err) => {
                 toggleState(route, false);
@@ -59,4 +62,12 @@ export const modifyPassword = (data, callback) => {
 
 export const pickPet = (data, callback) => {
     request('init-egg', data, callback);
+}
+
+export const markEvent = (data, callback) => {
+    request('mark-event', data, callback);
+}
+
+export const endWorking = (callback) => {
+    request('end-working', {}, callback);
 }

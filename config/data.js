@@ -7,8 +7,9 @@ export const petType = {
 
 export const eventType = {
     attack: 1,
-    work: 2,
-    enhance: 3,  // 喝药水增强
+    startWorking: 2,
+    endWorking: 3,
+    enhance: 4,  // 喝药水增强
 }
 
 const levels = [
@@ -34,12 +35,6 @@ const levels = [
     { level: 20, exp: 600 },
 ];
 
-export const rewardsMap = {
-    1: { force: 3, defence: 3, agility: 3, exp: 10, coin: 50 },
-    2: { force: 2, defence: 2, agility: 2, exp: 8, coin: 30 },
-    3: { force: 1, defence: 1, agility: 1, exp: 7, coin: 20 },
-    4: { exp: 5, coin: 10 }
-};
 
 export function getLevel(exp = 0) {
     let level = 0;
@@ -53,6 +48,13 @@ export function getLevel(exp = 0) {
 
     return level
 }
+
+export const rewardsMap = {
+    1: { force: 3, defence: 3, agility: 3, exp: 10, coin: 50 },
+    2: { force: 2, defence: 2, agility: 2, exp: 8, coin: 30 },
+    3: { force: 1, defence: 1, agility: 1, exp: 7, coin: 20 },
+    4: { exp: 5, coin: 10 }
+};
 
 export function getPetStage(level = 0) {
     let stage = 1;

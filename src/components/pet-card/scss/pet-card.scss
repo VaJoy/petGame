@@ -3,8 +3,13 @@
   height: 5rem;
   width: 4rem;
   border-radius: 0.1rem;
-  background: #eff8eb;
+  background-color: #eff8eb;
   margin-right: 0.2rem;
+  transition: background-color .3s;
+
+  &:hover {
+    background-color: #ddfbcf;
+  }
 
   &:nth-of-type(n+7) {
     margin-top: 0.2rem;
@@ -19,6 +24,10 @@
     position: absolute;
     height: 5rem;
     width: 4rem;
+
+    .pet-canvas {
+      cursor: pointer;
+    }
   }
 
   .host-name {
@@ -36,5 +45,45 @@
     border-radius: 0.2rem;
     background: #ffbf1d;
     text-shadow: 1px 1px 1px hsl(29, 100%, 16%);
+  }
+
+  &.mine .host-name {
+    background: #7fc1e2;
+  }
+
+  .op-wrap {
+    position: absolute;
+    left: .2rem;
+    bottom: .2rem;
+    z-index: 99;
+
+    span {
+      font-family: "iconfont" !important;
+      font-size: .3rem;
+      font-style: normal;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffbf1d;
+      width: .7rem;
+      height: .7rem;
+      border-radius: 50%;
+      margin-top: .2rem;
+      color: white;
+      text-shadow: 1px 1px 1px hsl(29deg 100% 16%);
+      cursor: pointer;
+      transition: background-color .3s;
+
+      &:hover {
+        background-color: #ff961d;
+      }
+    }
+
+    &.op-r-wrap{
+      left: auto;
+      right: .2rem;
+    }
   }
 }
