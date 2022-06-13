@@ -1,5 +1,6 @@
 USE petgame;
 
+
 CREATE TABLE IF NOT EXISTS `users`(
    `id` INT UNSIGNED AUTO_INCREMENT,
    `name` VARCHAR(60) NOT NULL,

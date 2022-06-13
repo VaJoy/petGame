@@ -17,8 +17,7 @@
 
 <script>
 import emitter from 'tiny-emitter/instance';
-
-let timeStamp = null;
+import { shopProps } from '@config/data';
 
 export default {
   props: ['myLevel'],

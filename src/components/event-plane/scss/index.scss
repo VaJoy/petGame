@@ -1,6 +1,6 @@
 .event-plane-wrap {
-  width: 13rem;
   padding: .5rem;
+
 
   h1 {
     color: #F1845F;
@@ -15,6 +15,37 @@
     line-height: 2;
     text-align: center;
   }
+
+  .event-wrap {
+    display: flex;
+
+    h2 {
+      font-size: .4rem;
+      font-weight: bold;
+      color: #F1845F;
+    }
+
+    p {
+      position: relative;
+      max-width: 10rem;
+
+      ul {
+        width: 100%;
+        max-height: 6rem;
+        overflow-y: auto;
+        li{
+          text-align: left;
+        }
+      }
+
+    }
+
+    p:nth-of-type(1) {
+      margin-right: 1rem;
+    }
+
+  }
+
 
   .button {
     cursor: pointer;

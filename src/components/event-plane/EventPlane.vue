@@ -1,13 +1,27 @@
 <template>
   <div class="mask-bg">
     <div class="event-plane-wrap dialog-base">
-      <h1>消息</h1>
-      <p v-if="isShow">
-        占位
+      <div class="event-wrap">
+        <p>
+        <h2><span class="iconfont">&#xec95;</span>我的消息</h2>
+        <ul v-if="myEvents.length">
+          <li v-for="item in myEvents" :key="'my-event-' + item.id">
+            <span class="mr-10">{{getTime(item)}}</span><span>{{getDesc(item)}}</span>
+          </li>
+        </ul>
+        <div v-else class="none-info">暂无</div>
       </p>
-      <p v-if="!isShow">
-        暂无消息
+      <p>
+        <h2><span class="iconfont">&#xe68e;</span>世界消息</h2>
+        <ul v-if="myEvents.length">
+          <li v-for="item in myEvents" :key="'my-event-' + item.id">
+            <span class="mr-10">{{getTime(item)}}</span><span>{{getDesc(item, true)}}</span>
+          </li>
+        </ul>
+        <div v-else class="none-info">暂无</div>
       </p>
+      </div>
+      
       <p>
         <span class="button" @click.stop="closePlane">返回</span>
       </p>
@@ -17,15 +31,12 @@
 
 <script>
 import emitter from 'tiny-emitter/instance';
-
-let timeStamp = null;
+import { eventType } from '@config/data.js';
+import moment from 'moment';
 
 export default {
-  props: ['myLevel'],
+  props: ['myEvents', 'events', 'userMap'],
   computed: {
-    isShow() {
-      return this.myLevel >= 2;
-    }
   },
   data() {
     return {
@@ -34,6 +45,31 @@ export default {
   methods: {
     closePlane() {
       emitter.emit('index/toggle-plane-state', 'event', false);
+    },
+    getTime(item = {}) {
+      return moment(item.c_time).format('MM-DD HH:mm');
+    },
+    getDesc(item = {}, showNick) {
+      let desc = '';
+      const myId = showNick || this.userMap.mine;
+      const { user_id, target_id, award_num } = item;
+      const userName = user_id === myId ? '我' : `「${this.userMap[user_id] || ''}」`;
+      const targetName = user_id === myId ? '我' : `「${this.userMap[target_id] || ''}」`;
+
+      switch(item.type) {
+        case eventType.attack:
+          if (award_num > 0) {
+            desc = `${userName}攻击并偷走了${targetName} ${award_num} 个金币。`;
+          } else {
+            desc = `${userName}攻击了${targetName}的宝宝。`;
+          }
+          
+          break;
+        case eventType.startWorking:
+          desc = `${userName}的宝宝打工赚取了 ${award_num} 个金币。`;
+          break;
+      }
+      return desc;
     }
   },
 }

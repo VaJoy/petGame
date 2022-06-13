@@ -1,6 +1,6 @@
 .rank-plane-wrap {
-  width: 13rem;
   padding: .5rem;
+
 
   h1 {
     color: #F1845F;
@@ -15,6 +15,57 @@
     line-height: 2;
     text-align: center;
   }
+
+  .rank-wrap {
+    display: flex;
+
+    h2 {
+      font-size: .4rem;
+      font-weight: bold;
+      color: #F1845F;
+    }
+
+    p {
+      position: relative;
+      margin-right: 1rem;
+
+      ul {
+        width: 100%;
+        max-height: 6rem;
+        overflow-y: auto;
+        li{
+          text-align: left;
+          vertical-align: middle;
+          .rank-num{
+            display: inline-block;
+            margin-right: .1rem;
+            width: .4rem;
+            height: .4rem;
+            text-align: center;
+            line-height: .4rem;
+            background-color: #F1845F;
+            color: #FFFCBB;
+            border-radius: 50%;
+          }
+          .rank-val{
+            margin-left: .1rem;
+            font-size: .25rem;
+            padding: .05rem .1rem;
+            background-color: #5ebbea;
+            color: white;
+            border-radius: .1rem;
+          }
+        }
+      }
+
+    }
+
+    p:nth-last-of-type(1) {
+      margin-right: 0;
+    }
+
+  }
+
 
   .button {
     cursor: pointer;

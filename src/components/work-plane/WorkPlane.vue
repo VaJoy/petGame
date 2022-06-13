@@ -66,7 +66,7 @@ export default {
           endWorking((json) => {
             if (json.code === codes.ok) {
               localStorage.setItem('last-work-date', moment().format('yyyy-MM-DD'));
-              alert('打工完成，获得 10 金币奖励！');
+              alert(`打工完成，获得 ${json.coins} 金币奖励！`);
             } else {
               console.log(json.err);
               alert(json.err || '打工失败，请截图联系 VJ。');

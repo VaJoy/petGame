@@ -6,7 +6,7 @@
     <div class="host-name" @click.stop>{{pet.isMine? '我的宝宝' : pet.name}} (v{{level}})</div>
     <div v-if="pet.isMine" class="op-wrap">
       <span title="打工" @click.stop="togglePlane('work', true)">&#xe8f4;</span>
-      <span title="事件" @click.stop="togglePlane('event', true)">&#xe604;</span>
+      <span title="消息" @click.stop="togglePlane('event', true)">&#xe604;</span>
       <span title="排行" @click.stop="togglePlane('rank', true)">&#xea06;</span>
     </div>
     <div v-if="pet.isMine" class="op-wrap op-r-wrap">

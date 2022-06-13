@@ -2,7 +2,7 @@ import mysql from 'mysql';
 import { password, adminId } from './secret.js';
 import { codes } from '../config/codes.js';
 import { errorHandler, cryptPassword, arrangePet, sqlFilter, getRandomNum } from './util.js';
-import { petType, rewardsMap, eventType } from '../config/data.js';
+import { petType, rewardsMap, eventType, getLevel, getUpdateReward } from '../config/data.js';
 import moment from 'moment';
 
 const connection = mysql.createConnection({
@@ -68,7 +68,8 @@ export function endWorking(req, callback) {
                         (err) => {
                             if (!errorHandler(err, 'sqlNativeError', callback)) {
                                 callback({
-                                    code: codes.ok
+                                    code: codes.ok,
+                                    coins
                                 })
                             }
                         });
@@ -110,6 +111,7 @@ export function markEvent(req, callback) {
 export function reward(req, callback) {
     const { query } = req;
     const { top1 = [], top2 = [], top3 = [], score100 = [], sign = [], isImmediate } = JSON.parse(query.data);
+
     const handler = () => {
         clearInterval(rewardTimestamp);
         checkLogin(req, true, (error) => {
@@ -121,7 +123,6 @@ export function reward(req, callback) {
                 if (err) {
                     return errorHandler(err, 'rewardOpError', callback);
                 }
-
 
                 const promises = [];
 
@@ -142,8 +143,17 @@ export function reward(req, callback) {
                 });
 
                 Promise.all(promises).then(() => {
-                    callback({ code: codes.ok })
+                    connection.commit(function(err) {
+                        if (err) {
+                          return connection.rollback(() => {
+                            throw err;
+                          });
+                        }
+                        callback({ code: codes.ok });
+                      });
+                    
                 }).catch(err => {
+                    connection.rollback();
                     errorHandler(err, callback);
                 })
             })
@@ -158,6 +168,7 @@ export function reward(req, callback) {
                 handler();
             }
         }, 1000 * 60);
+        callback({code: codes.ok});
     }
 }
 
@@ -176,6 +187,17 @@ function addRewards(id, { force, defence, agility, exp, signExp, coin }) {
 
                 let sql = '';
                 const ret = results[0];
+
+                if (exp || signExp) {
+                    const oldLevel = getLevel(ret.exp + ret.sign_exp);
+                    const newLevel = getLevel(ret.exp + (exp || 0) + (signExp || 0));
+                    if (newLevel > oldLevel) {  // 升级处理
+                        const rewards = getUpdateReward(oldLevel, newLevel);
+                        force = (force || 0) + (rewards.force || 0);
+                        defence = (defence || 0) + (rewards.defence || 0);
+                        agility = (agility || 0) + (rewards.agility || 0);
+                    }
+                }
 
                 if (force || defence || agility || exp || signExp) {
                     sql = `update pets set `;
@@ -200,7 +222,7 @@ function addRewards(id, { force, defence, agility, exp, signExp, coin }) {
                 }
 
                 if (coin) {
-                    sql += `update users set coin=${ret.coin + coin} where id=${id}`
+                    sql += `update users set coin=${ret.coin + coin} where id=${id}`;
                 }
 
                 connection.query(sql, (err) => {
@@ -260,6 +282,16 @@ export function getInitData(req, callback) {
         });
     });
 
+    const getAttacks = new Promise((resolve, reject) => {
+        connection.query(`SELECT user_id, count(1) as times from events where success=1 and type=${eventType.attack} group by user_id order by times DESC`, function (error, results) {
+            if (error) {
+                return reject(error);
+            }
+            resolve(results)
+        });
+    });
+
+
     const getEvents = new Promise((resolve, reject) => {
         connection.query(`SELECT a.*, b.name as award_name, b.num as award_num from events a left join awards b on a.id=b.event_id 
         where a.success=1 order by a.c_time DESC LIMIT 10`, function (error, results) {
@@ -290,17 +322,18 @@ export function getInitData(req, callback) {
         });
     });
 
-    const queryList = [getPets, getEvents];
+    const queryList = [getPets, getEvents, getAttacks];
     if (session_id && user_id) {
         queryList.push(getUserInfo, getMyEvents, getMyProps);
     }
 
-    Promise.all(queryList).then(([pets = [], events = [], userInfo = [], myEvents = [], myProps = []]) => {
+    Promise.all(queryList).then(([pets = [], events = [], attacks = [], userInfo = [], myEvents = [], myProps = []]) => {
         const time = Date.now();
         let result = {
             time,
             code: codes.ok,
             pets,
+            attacks,
             events
         };
 

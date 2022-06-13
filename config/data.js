@@ -35,6 +35,38 @@ const levels = [
     { level: 20, exp: 600 },
 ];
 
+export const getUpdateReward = (oldLevel, newLevel) => {
+    const rewards = {
+        1: { force: 1, defence: 1, agility: 1 },
+        5: { force: 2, defence: 2, agility: 2 },
+        10: { force: 3, defence: 3, agility: 3 },
+        15: { force: 5, defence: 5, agility: 5 },
+        20: { force: 10, defence: 10, agility: 10 },
+    }
+
+    let ret = { force: 0, defence: 0, agility: 0 };
+    const combineRewards = (a, b) => {
+        return {
+            force: a.force + b.force, 
+            defence: a.defence + b.defence, 
+            agility: a.agility + b.agility,
+        }
+    }
+
+    for(let level in rewards) {
+        if (newLevel >= level) {
+            ret = rewards[level];
+            if (newLevel - oldLevel > 1) {
+                ret = combineRewards(ret, getUpdateReward(oldLevel, newLevel - 1))
+            } 
+        } else {
+            break;
+        }
+    }
+
+    return ret;
+}
+
 export function getNextLevelExp(exp = 0) {
     const nextLevel = getLevel(exp) + 1;
     let ret = 0;
@@ -86,6 +118,14 @@ export function getPetStage(level = 0) {
 
     return stage
 }
+
+export const shopProps = [
+    { type: 1, name: '武神胶囊', price: 100, desc: '增加 1 点武力值' },
+    { type: 2, name: '强身秘籍', price: 100, desc: '增加 1 点防御值' },
+    { type: 3, name: '敏捷药水', price: 100, desc: '增加 1 点敏捷值' },
+    { type: 4, name: '点化丹', price: 150, desc: '随机增加 2 点属性' },
+    { type: 5, name: '聚灵丹', price: 200, desc: '增加 15 点经验' },
+];
 
 // mock data belows
 export const initData = {
@@ -258,12 +298,3 @@ export const events = [
         award: [{ type: 'force', num: 1 }],
     }
 ]
-
-export const shopInfo = {
-    list: [
-        { type: 1, name: '武神胶囊', price: 100, desc: '增加 1 点武力值' },
-        { type: 2, name: '强身秘籍', price: 100, desc: '增加 1 点防御值' },
-        { type: 3, name: '敏捷药水', price: 100, desc: '增加 1 点敏捷值' },
-        { type: 4, name: '紫金丹', price: 150, desc: '随机增加 2 点属性' },
-    ]
-}

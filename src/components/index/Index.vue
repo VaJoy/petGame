@@ -5,8 +5,8 @@
     <Login v-if="isInitRequestDone && !hasLogined && !isRequesting"></Login>
     <ChoosePet v-if="isInitRequestDone && hasLogined && !hasPet && !isRequesting"></ChoosePet>
     <WorkPlane v-if="planeState.work" :myLevel="myLevel"></WorkPlane>
-    <EventPlane v-if="planeState.event" :myLevel="myLevel"></EventPlane>
-    <RankPlane v-if="planeState.rank" :myLevel="myLevel"></RankPlane>
+    <EventPlane v-if="planeState.event" :userMap="userMap" :events="initData.events" :myEvents="initData.myEvents"></EventPlane>
+    <RankPlane v-if="planeState.rank" :pets="pets" :userMap="userMap" :attacks="attacks"></RankPlane>
     <ShopPlane v-if="planeState.shop" :myLevel="myLevel"></ShopPlane>
     <BagPlane v-if="planeState.bag" :myLevel="myLevel"></BagPlane>
     <InfoCard :pet="infoCard.pet" :axis="infoCard.axis" v-if="infoCard.isShow"></InfoCard>
@@ -55,6 +55,7 @@ emitter.on('request/loading', (state) => {
 });
 
 emitter.on('index/toggle-plane-state', (plane, state) => {
+  infoCard.isShow = false;
   planeState[plane] = state;
 });
 
@@ -93,6 +94,20 @@ export default {
     },
     pets() {
       return this.initData.pets || [];
+    },
+    attacks() {
+      return this.initData.attacks || [];
+    },
+    userMap() {
+      const map = {};
+      const pets = this.initData.pets || [];
+      pets.forEach(pet => {
+        map[pet.user_id] = pet.name;
+        if (pet.isMine) {
+          map.mine = pet.user_id
+        }
+      });
+      return map;
     },
     hasPet() {
       return this.initData.pets[0]?.isMine
