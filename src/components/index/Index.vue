@@ -1,7 +1,7 @@
 <template>
-  <div class="pets-wrap">
-    <PetCard v-for="(pet, index) in initData?.pets" :pet="pet" :key="`pet-${pet.id}`" :hasLogined="hasLogined"
-      :permission="initData.permission"></PetCard>
+  <div class="pets-wrap" @click="clickWrap">
+    <PetCard v-for="(pet, index) in initData?.pets" :pet="pet" :key="`pet-${pet.id}`" 
+    :hasLogined="hasLogined"></PetCard>
     <Login v-if="isInitRequestDone && !hasLogined && !isRequesting"></Login>
     <ChoosePet v-if="isInitRequestDone && hasLogined && !hasPet && !isRequesting"></ChoosePet>
     <WorkPlane v-if="planeState.work" :myLevel="myLevel"></WorkPlane>
@@ -9,6 +9,7 @@
     <RankPlane v-if="planeState.rank" :myLevel="myLevel"></RankPlane>
     <ShopPlane v-if="planeState.shop" :myLevel="myLevel"></ShopPlane>
     <BagPlane v-if="planeState.bag" :myLevel="myLevel"></BagPlane>
+    <InfoCard :pet="infoCard.pet" :axis="infoCard.axis" v-if="infoCard.isShow"></InfoCard>
     <Loading v-if="isRequesting"></Loading>
   </div>
 </template>
@@ -19,6 +20,7 @@ import Login from '../login/Login.vue';
 import Loading from '../loading/Loading.vue';
 import ChoosePet from '../choose-pet/ChoosePet.vue';
 import PetCard from '../pet-card/PetCard.vue';
+import InfoCard from '../info-card/InfoCard.vue'
 import { getInitData } from '@js/request.js';
 import { codes } from '@config/codes.js';
 import emitter from 'tiny-emitter/instance';
@@ -33,6 +35,7 @@ let initData = reactive({});
 let planeState = reactive({});
 let isRequesting = ref(true);
 let isInitRequestDone = ref(false);
+const infoCard = reactive({ isShow: false, pet: {}, axis: {} });
 
 const initOrResetData = () => {
   getInitData((data) => {
@@ -57,8 +60,20 @@ emitter.on('index/toggle-plane-state', (plane, state) => {
 
 emitter.on('request/reload', initOrResetData);
 
+emitter.on('index/click-pet', (pet) => {
+  infoCard.pet = pet;
+  infoCard.isShow = !(infoCard.isShow);
+  if (infoCard.isShow) {
+    console.log(event);
+    const { pageX, pageY } = event;
+    infoCard.axis = {
+      x: pageX, y: pageY
+    }
+  }
+});
+
 export default {
-  components: { PetCard, Login, Loading, ChoosePet, WorkPlane, EventPlane, BagPlane, ShopPlane, RankPlane },
+  components: { PetCard, InfoCard, Login, Loading, ChoosePet, WorkPlane, EventPlane, BagPlane, ShopPlane, RankPlane },
   setup() {
     initOrResetData();
     return {
@@ -66,6 +81,10 @@ export default {
       isRequesting,
       isInitRequestDone,
       planeState,
+      infoCard,
+      clickWrap() {
+        infoCard.isShow = false;
+      }
     }
   },
   computed: {

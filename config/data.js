@@ -35,6 +35,19 @@ const levels = [
     { level: 20, exp: 600 },
 ];
 
+export function getNextLevelExp(exp = 0) {
+    const nextLevel = getLevel(exp) + 1;
+    let ret = 0;
+    for(let i = 0, item; item = levels[i]; i++) {
+        if (nextLevel === item.level) {
+            ret = item.exp;
+            break;
+        }
+    }
+
+    return ret;
+}
+
 
 export function getLevel(exp = 0) {
     let level = 0;

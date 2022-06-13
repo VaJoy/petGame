@@ -1,7 +1,7 @@
 import mysql from 'mysql';
 import { password, adminId } from './secret.js';
 import { codes } from '../config/codes.js';
-import { errorHandler, cryptPassword, arrangePet, sqlFilter } from './util.js';
+import { errorHandler, cryptPassword, arrangePet, sqlFilter, getRandomNum } from './util.js';
 import { petType, rewardsMap, eventType } from '../config/data.js';
 import moment from 'moment';
 
@@ -62,7 +62,9 @@ export function endWorking(req, callback) {
 
                 const timeSpan = Date.now() - (c_time + 3600000);
                 if (Math.abs(timeSpan) <= 60000 * 2) {
-                    connection.query(`update users set coin=(coin+10) where id=${userId}; update events set success=1 where id=${id}`,
+                    const coins = getRandomNum(8, 13);
+                    connection.query(`update users set coin=(coin+${coins}) where id=${userId}; update events set success=1 where id=${id};
+                    insert into awards (num, name, event_id) values (${coins}, '金币', ${id})`,
                         (err) => {
                             if (!errorHandler(err, 'sqlNativeError', callback)) {
                                 callback({
@@ -109,6 +111,7 @@ export function reward(req, callback) {
     const { query } = req;
     const { top1 = [], top2 = [], top3 = [], score100 = [], sign = [], isImmediate } = JSON.parse(query.data);
     const handler = () => {
+        clearInterval(rewardTimestamp);
         checkLogin(req, true, (error) => {
             if (errorHandler(error, 'limitedAccess', callback)) {
                 return;
@@ -151,10 +154,10 @@ export function reward(req, callback) {
         handler()
     } else {
         rewardTimestamp = setInterval(() => {
-            Timeout
-        }, interval);(() => {
-
-        })
+            if (new Date().getHours() === 0) {
+                handler();
+            }
+        }, 1000 * 60);
     }
 }
 
@@ -258,7 +261,8 @@ export function getInitData(req, callback) {
     });
 
     const getEvents = new Promise((resolve, reject) => {
-        connection.query(`SELECT * from events order by c_time DESC LIMIT 10`, function (error, results) {
+        connection.query(`SELECT a.*, b.name as award_name, b.num as award_num from events a left join awards b on a.id=b.event_id 
+        where a.success=1 order by a.c_time DESC LIMIT 10`, function (error, results) {
             if (error) {
                 return reject(error);
             }
@@ -267,8 +271,9 @@ export function getInitData(req, callback) {
     });
 
     const getMyEvents = new Promise((resolve, reject) => {
-        connection.query(`SELECT * from events where user_id=${user_id | 0} or target_id=${user_id | 0} order by c_time DESC LIMIT 10`,
-            function (error, results, fields) {
+        connection.query(`SELECT a.*, b.name as award_name, b.num as award_num from events a left join awards b on a.id=b.event_id
+        where (a.user_id=${user_id | 0} or a.target_id=${user_id | 0}) and a.success=1 order by a.c_time DESC LIMIT 10`,
+            function (error, results) {
                 if (error) {
                     return reject(error);
                 }
