@@ -3,6 +3,10 @@ import session from 'express-session';
 import sessionFileStore from 'session-file-store';
 import rateLimit from 'express-rate-limit'
 import { codes } from '../config/codes.js';
+import fs from 'fs';
+import path from 'path';
+import https from 'https';
+import http from 'http';
 import {
     login, modifyPassword, getInitData, initEgg, attack,
     reward, markEvent, endWorking, buyProp, useProp
@@ -10,6 +14,8 @@ import {
 import cors from 'cors';
 import bodyParser from 'body-parser'
 
+const key = fs.readFileSync(path.resolve('./config/server.key.pem'));
+const cert = fs.readFileSync(path.resolve('./config/server.crt'));
 const FileStore = sessionFileStore(session);
 const app = express();
 const identityKey = 'studyroom2022';
@@ -19,7 +25,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
 
 app.use(cors({
-    origin: [/http\:\/\/localhost\:\d+$/, /\.github\.io$/],
+    origin: [/https?\:\/\/localhost\:\d+$/, /\.github\.io$/],
     credentials: true,  // Access-Control-Allow-Credentials
     optionsSuccessStatus: 200
 }));
@@ -37,6 +43,7 @@ app.use(session({
     name: identityKey,
     secret: identityKey,
     store: new FileStore(),
+    sameSite: 'none',
     cookie: ('name', 'value', { path: '/', httpOnly: true, secure: false, maxAge: 60000 * 24 * 90 }),
     resave: false,
     rolling: true,
@@ -119,4 +126,6 @@ app.get('/reward', function (req, res) {
     })
 });
 
-app.listen(2022);
+app.set('port', 2022);
+http.createServer(app).listen(2022);
+https.createServer({ key, cert}, app).listen(2023);
