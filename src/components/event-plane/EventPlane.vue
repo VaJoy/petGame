@@ -13,8 +13,8 @@
       </p>
       <p>
         <h2><span class="iconfont">&#xe68e;</span>世界消息</h2>
-        <ul v-if="myEvents.length">
-          <li v-for="item in myEvents" :key="'my-event-' + item.id">
+        <ul v-if="events.length">
+          <li v-for="item in events" :key="'my-event-' + item.id">
             <span class="mr-10">{{getTime(item)}}</span><span>{{getDesc(item, true)}}</span>
           </li>
         </ul>

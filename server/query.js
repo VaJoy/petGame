@@ -1,8 +1,8 @@
 import mysql from 'mysql';
 import { password, adminId } from './secret.js';
 import { codes } from '../config/codes.js';
-import { errorHandler, cryptPassword, arrangePet, sqlFilter, getRandomNum } from './util.js';
-import { petType, rewardsMap, eventType, getLevel, getUpdateReward } from '../config/data.js';
+import { errorHandler, cryptPassword, arrangePet, sqlFilter, getRandomNum, rollbackHandler, generateEffectSql } from './util.js';
+import { petType, rewardsMap, eventType, getLevel, getUpdateReward, shopProps, getPropEffect } from '../config/data.js';
 import moment from 'moment';
 
 const connection = mysql.createConnection({
@@ -28,6 +28,110 @@ export function checkLogin(req, needAdmin, next) {
             }
         });
 }
+
+export function buyProp(req, callback) {
+    const { body, session } = req;
+    const type = (body?.type) | 0;
+    const prop = shopProps[type - 1];
+    const userId = session.user_id | 0;
+    if (!prop) return errorHandler('找不到该道具', callback);
+    connection.query(`SELECT coin from users where session_id="${sqlFilter(session.id)}" and id=${userId};`,
+        function (error, results) {
+            if (error || !results.length) {
+                return errorHandler(error || '参数错误', 'limitedAccess', callback);
+            }
+
+            const coin = results[0].coin;
+            const price = prop.price;
+            if (coin < price) {
+                return errorHandler('没有足够的金币', callback);
+            }
+
+            connection.beginTransaction((err) => {
+                if (err) {
+                    return errorHandler(err, 'buyOpError', callback);
+                }
+
+                connection.query(`update users set coin=(coin-${price}) where id=${userId};
+                insert into props (type, user_id, is_valid) values (${type}, ${userId}, 1)`, (err) => {
+                    if (err) {
+                        return rollbackHandler(connection, err, 'buyOpError', callback);
+                    }
+
+                    connection.commit((err) => {
+                        if (err) {
+                            return rollbackHandler(connection, err, 'buyOpError', callback);
+                        }
+
+                        callback({ code: codes.ok });
+                    });
+                });
+            });
+        });
+}
+
+export function useProp(req, callback) {
+    const { body, session } = req;
+    checkLogin(req, false, (error) => {
+        if (errorHandler(error, 'limitedAccess', callback)) {
+            return;
+        }
+
+        const type = (body?.type) | 0;
+        const prop = shopProps[type - 1];
+        const userId = session.user_id | 0;
+        if (!prop) return errorHandler('找不到该道具', callback);
+
+        const effect = getPropEffect(type);
+        const effectSql = 'update pets set ' + generateEffectSql(effect) + ` where user_id=${userId};`;
+
+        connection.beginTransaction((err) => {
+            if (err) {
+                return errorHandler(err, 'useOpError', callback);
+            }
+
+            connection.query(`update props set is_valid=0 where is_valid=1 and type=${type | 0} and user_id=${userId} limit 1; ${effectSql}`,
+                (error) => {
+                    if (errorHandler(error, 'useOpError', callback)) {
+                        return;
+                    }
+
+                    connection.commit((err) => {
+                        if (err) {
+                            return rollbackHandler(connection, err, 'useOpError', callback);
+                        }
+
+                        callback({ code: codes.ok, effect });
+                    });
+                });
+        });
+
+
+    });
+}
+
+export function attack(req, callback) {
+    const { body, session } = req;
+    const target = body?.target | 0;
+    const userId = session.user_id | 0;
+
+    connection.query(`SELECT a.coin, b.* from users a left join pets b on b.user_id=a.id
+    where a.session_id="${sqlFilter(session.id)}" and a.id=${userId};
+    select a.*, b.coin from pets a left join users b on a.user_id=b.id where a.user_id=${target}`,
+        function (error, results) {
+            if (error || !results[0]?.length || !results[1]?.length) {
+                return errorHandler(error || '参数错误', 'attackOpError', callback);
+            }
+
+            const userInfo = results[0][0];
+            const targetInfo = results[1][0];
+
+            console.log(userInfo, targetInfo);
+            callback({code: codes.ok});
+        }
+    );
+}
+
 
 export function endWorking(req, callback) {
     const { session } = req;
@@ -119,7 +223,7 @@ export function reward(req, callback) {
                 return;
             }
 
-            connection.beginTransaction(function (err) {
+            connection.beginTransaction((err) => {
                 if (err) {
                     return errorHandler(err, 'rewardOpError', callback);
                 }
@@ -143,18 +247,17 @@ export function reward(req, callback) {
                 });
 
                 Promise.all(promises).then(() => {
-                    connection.commit(function(err) {
+                    connection.commit((err) => {
                         if (err) {
-                          return connection.rollback(() => {
-                            throw err;
-                          });
+                            return rollbackHandler(connection, err, 'rewardOpError', callback);
                         }
+
                         callback({ code: codes.ok });
-                      });
-                    
+                    });
+
                 }).catch(err => {
                     connection.rollback();
-                    errorHandler(err, callback);
+                    rollbackHandler(connection, err, 'rewardOpError', callback);
                 })
             })
         });
@@ -168,7 +271,7 @@ export function reward(req, callback) {
                 handler();
             }
         }, 1000 * 60);
-        callback({code: codes.ok});
+        callback({ code: codes.ok });
     }
 }
 
@@ -314,7 +417,7 @@ export function getInitData(req, callback) {
     });
 
     const getMyProps = new Promise((resolve, reject) => {
-        connection.query(`SELECT * from props where user_id=${user_id | 0}`, function (error, results) {
+        connection.query(`SELECT type, count(1) as nums from props where user_id=${user_id | 0} and is_valid=1 group by type`, function (error, results) {
             if (error) {
                 return reject(error);
             }

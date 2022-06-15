@@ -4,16 +4,21 @@
     <p>防御：<span :title="pet.defence"><em :style="{ width: getPercent(pet.defence) }"></em></span></p>
     <p>敏捷：<span :title="pet.agility"><em :style="{ width: getPercent(pet.agility) }"></em></span></p>
     <p>经验：<span :title="pet.total_exp"><em :style="{ width: levelPercent }"></em></span></p>
+    <div v-if="!pet.isMine" class="attack">
+      <span class="button" @click.stop="clickAttack">攻击该宝宝</span>
+    </div>
   </div>
 </template>
 
 <script>
 import { shallowReactive, ref } from 'vue';
 import emitter from 'tiny-emitter/instance';
-import { getNextLevelExp } from '@config/data.js'
+import { getNextLevelExp, levels } from '@config/data.js'
+import { attack } from '@js/request.js';
+import { codes } from '@config/codes.js';
 
 export default {
-  props: ['pet', 'axis'],
+  props: ['pet', 'axis', 'myLevel'],
   computed: {
     x() {
       let x = 0;
@@ -61,7 +66,28 @@ export default {
         const percent = (val / maxFeatrueVal).toFixed(2) * 100;
         return percent + '%';
       },
-      levelPercent: ((total_exp / nextLevelExp).toFixed(2) * 100) + '%'
+      levelPercent: ((total_exp / nextLevelExp).toFixed(2) * 100) + '%',
+      clickAttack() {
+        if (this.myLevel < 5) {
+          return alert('宝宝 5 级后才能发动攻击哦。');
+        }
+
+        if (total_exp < levels[2].exp) {
+          return alert('该宝宝还小，就别欺负它了。');
+        }
+
+        if (confirm(`确定攻击${name}的宝宝么？`)) {
+          attack({ target: props.pet.user_id }, (data) => {
+            if (data.code !== codes.ok) {
+              return alert(data.err);
+            }
+
+            emitter.emit('request/reload');
+
+            alert('攻击成功');
+          });
+        }
+      }
     }
   },
 }
@@ -90,6 +116,12 @@ export default {
         display: inline-block
         height: .2rem
         background: #ffbf1d
-
-
+  .attack
+    margin-top: .2rem
+    text-align: center
+    .button
+      display: inline-block
+      font-size: .2rem
+      padding: .2rem .3rem
+      border-radius: .2rem
 </style>

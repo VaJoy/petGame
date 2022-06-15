@@ -30,7 +30,7 @@ export const request = (function () {
                 throw new Error('请求失败');
             })
             .then((data) => {
-                toggleState(route, false);
+                silent || toggleState(route, false);
                 if (typeof data.err === 'object') {
                     data.err = JSON.stringify(data.err);
                 }
@@ -38,7 +38,7 @@ export const request = (function () {
                 callback(data);
             })
             .catch((err) => {
-                toggleState(route, false);
+                silent || toggleState(route, false);
                 callback({
                     err,
                     code: codes.clientError
@@ -70,4 +70,16 @@ export const markEvent = (data, callback) => {
 
 export const endWorking = (callback) => {
     request('end-working', {}, callback);
+}
+
+export const buyProp = (data, callback) => {
+    request('buy-prop', data, callback);
+}
+
+export const useProp = (data, callback) => {
+    request('use-prop', data, callback);
+}
+
+export const attack = (data, callback) => {
+    request('attack', data, callback);
 }

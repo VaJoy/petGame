@@ -1,3 +1,5 @@
+import { getRandomNum } from '../server/util.js';
+
 export const petType = {
     none: 0,
     cat: 1,
@@ -12,7 +14,7 @@ export const eventType = {
     enhance: 4,  // 喝药水增强
 }
 
-const levels = [
+export const levels = [
     { level: 1, exp: 10 },
     { level: 2, exp: 20 },
     { level: 3, exp: 40 },
@@ -47,18 +49,18 @@ export const getUpdateReward = (oldLevel, newLevel) => {
     let ret = { force: 0, defence: 0, agility: 0 };
     const combineRewards = (a, b) => {
         return {
-            force: a.force + b.force, 
-            defence: a.defence + b.defence, 
+            force: a.force + b.force,
+            defence: a.defence + b.defence,
             agility: a.agility + b.agility,
         }
     }
 
-    for(let level in rewards) {
+    for (let level in rewards) {
         if (newLevel >= level) {
             ret = rewards[level];
             if (newLevel - oldLevel > 1) {
                 ret = combineRewards(ret, getUpdateReward(oldLevel, newLevel - 1))
-            } 
+            }
         } else {
             break;
         }
@@ -70,7 +72,7 @@ export const getUpdateReward = (oldLevel, newLevel) => {
 export function getNextLevelExp(exp = 0) {
     const nextLevel = getLevel(exp) + 1;
     let ret = 0;
-    for(let i = 0, item; item = levels[i]; i++) {
+    for (let i = 0, item; item = levels[i]; i++) {
         if (nextLevel === item.level) {
             ret = item.exp;
             break;
@@ -83,8 +85,8 @@ export function getNextLevelExp(exp = 0) {
 
 export function getLevel(exp = 0) {
     let level = 0;
-    for(let i = 0, item; item = levels[i]; i++) {
-        if(exp >= item.exp) {
+    for (let i = 0, item; item = levels[i]; i++) {
+        if (exp >= item.exp) {
             level = item.level;
         } else {
             break;
@@ -120,12 +122,46 @@ export function getPetStage(level = 0) {
 }
 
 export const shopProps = [
-    { type: 1, name: '武神胶囊', price: 100, desc: '增加 1 点武力值' },
-    { type: 2, name: '强身秘籍', price: 100, desc: '增加 1 点防御值' },
-    { type: 3, name: '敏捷药水', price: 100, desc: '增加 1 点敏捷值' },
-    { type: 4, name: '点化丹', price: 150, desc: '随机增加 2 点属性' },
-    { type: 5, name: '聚灵丹', price: 200, desc: '增加 15 点经验' },
+    { type: 1, name: '武力牛奶', price: 100, desc: '增加 1 点武力值' },
+    { type: 2, name: '防御咖啡', price: 100, desc: '增加 1 点防御值' },
+    { type: 3, name: '敏捷绿茶', price: 100, desc: '增加 1 点敏捷值' },
+    { type: 4, name: '随缘面包', price: 150, desc: '随机增加 2 点属性' },
+    { type: 5, name: '阅历面包', price: 200, desc: '增加 15 点经验' },
 ];
+
+export function getPropEffect(type) {
+    const effect = {};
+    switch (type) {
+        case 1:
+            effect.force = 1;
+            break;
+        case 2:
+            effect.defence = 1;
+            break;
+        case 3:
+            effect.agility = 1;
+            break;
+        case 4:
+            getRandomEffect(effect);
+            getRandomEffect(effect);
+            break;
+        case 5:
+            effect.exp = 15;
+            break;
+        default:
+            break;
+    }
+
+    return effect;
+}
+
+
+function getRandomEffect(effect) {
+    const featrues = ['force', 'defence', 'agility'];
+    const index = getRandomNum(0, 2);
+    const featrue = featrues[index];
+    effect[featrue] = 1 + (effect[featrue] || 0);
+}
 
 // mock data belows
 export const initData = {

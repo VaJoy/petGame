@@ -1,5 +1,5 @@
 .rank-plane-wrap {
-  padding: .5rem;
+  padding: .5rem .8rem;
 
 
   h1 {
@@ -27,7 +27,7 @@
 
     p {
       position: relative;
-      margin-right: 1rem;
+      margin-right: 1.3rem;
 
       ul {
         width: 100%;
@@ -36,23 +36,26 @@
         li{
           text-align: left;
           vertical-align: middle;
+          margin-top: .1rem;
           .rank-num{
             display: inline-block;
             margin-right: .1rem;
             width: .4rem;
             height: .4rem;
+            font-size: 12px;
+            font-weight: bold;
             text-align: center;
             line-height: .4rem;
-            background-color: #F1845F;
-            color: #FFFCBB;
+            background-color: rgba(255,255,255,.4);
+            color: #F1845F;
             border-radius: 50%;
           }
           .rank-val{
             margin-left: .1rem;
-            font-size: .25rem;
+            font-size: 12px;
             padding: .05rem .1rem;
             background-color: #5ebbea;
-            color: white;
+            color: rgb(255, 255, 255, .9);
             border-radius: .1rem;
           }
         }

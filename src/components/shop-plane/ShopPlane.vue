@@ -2,12 +2,18 @@
   <div class="mask-bg">
     <div class="shop-plane-wrap dialog-base">
       <h1>商店</h1>
-      <p v-if="isShow">
-        占位
-      </p>
-      <p v-if="!isShow">
-        暂未开放，敬请期待
-      </p>
+      <h2 title="我的金币"><span class="iconfont">&#xe618;</span><span>{{ myInfo.coin }}</span></h2>
+      <ul>
+        <li v-for="(item, index) in shopProps">
+          <div class="prop-icon" :class="'prop-icon-' + item.type"></div>
+          <div class="prop-info-wrap">
+            <p class="name">{{ item.name }}</p>
+            <p class="desc">{{ item.desc }}</p>
+            <p class="price"><span class="iconfont">&#xe618;</span>{{ item.price }}</p>
+            <p><span class="button" @click.stop="clickBuy(item)">购买</span></p>
+          </div>
+        </li>
+      </ul>
       <p>
         <span class="button" @click.stop="closePlane">返回</span>
       </p>
@@ -18,22 +24,39 @@
 <script>
 import emitter from 'tiny-emitter/instance';
 import { shopProps } from '@config/data';
+import { codes } from '@config/codes.js';
+import { buyProp } from '@js/request.js';
 
 export default {
-  props: ['myLevel'],
+  props: ['myInfo'],
   computed: {
-    isShow() {
-      return this.myLevel >= 2;
-    }
   },
   data() {
     return {
+      shopProps
     }
   },
   methods: {
     closePlane() {
       emitter.emit('index/toggle-plane-state', 'shop', false);
-    }
+    },
+    clickBuy(item) {
+      if (item.price > this.myInfo.coin) {
+        return alert('你的金币不够哦 :(');
+      }
+
+      if (confirm(`确定花费 ${item.price} 金币购买「${item.name}」么？`)) {
+        buyProp(item, (data) => {
+          if (data.code !== codes.ok) {
+            return alert(data.err);
+          }
+
+          emitter.emit('request/reload');
+
+          alert('购买成功，快去背包使用吧');
+        })
+      }
+    },
   },
 }
 </script>

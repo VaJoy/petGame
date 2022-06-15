@@ -1,15 +1,15 @@
 <template>
   <div class="pets-wrap" @click="clickWrap">
     <PetCard v-for="(pet, index) in initData?.pets" :pet="pet" :key="`pet-${pet.id}`" 
-    :hasLogined="hasLogined"></PetCard>
+      :initData="initData"></PetCard>
     <Login v-if="isInitRequestDone && !hasLogined && !isRequesting"></Login>
     <ChoosePet v-if="isInitRequestDone && hasLogined && !hasPet && !isRequesting"></ChoosePet>
     <WorkPlane v-if="planeState.work" :myLevel="myLevel"></WorkPlane>
     <EventPlane v-if="planeState.event" :userMap="userMap" :events="initData.events" :myEvents="initData.myEvents"></EventPlane>
     <RankPlane v-if="planeState.rank" :pets="pets" :userMap="userMap" :attacks="attacks"></RankPlane>
-    <ShopPlane v-if="planeState.shop" :myLevel="myLevel"></ShopPlane>
-    <BagPlane v-if="planeState.bag" :myLevel="myLevel"></BagPlane>
-    <InfoCard :pet="infoCard.pet" :axis="infoCard.axis" v-if="infoCard.isShow"></InfoCard>
+    <ShopPlane v-if="planeState.shop" :myInfo="myInfo"></ShopPlane>
+    <BagPlane v-if="planeState.bag" :myInfo="myInfo" :myProps="myProps"></BagPlane>
+    <InfoCard :pet="infoCard.pet" :axis="infoCard.axis" :myLevel="myLevel" v-if="infoCard.isShow"></InfoCard>
     <Loading v-if="isRequesting"></Loading>
   </div>
 </template>
@@ -40,7 +40,7 @@ const infoCard = reactive({ isShow: false, pet: {}, axis: {} });
 const initOrResetData = () => {
   getInitData((data) => {
     if (data.code !== codes.ok) {
-      alert(data.err || '请求失败，请稍后重试');
+      alert(data.err);
       return;
     }
 
@@ -65,7 +65,6 @@ emitter.on('index/click-pet', (pet) => {
   infoCard.pet = pet;
   infoCard.isShow = !(infoCard.isShow);
   if (infoCard.isShow) {
-    console.log(event);
     const { pageX, pageY } = event;
     infoCard.axis = {
       x: pageX, y: pageY
@@ -91,6 +90,9 @@ export default {
   computed: {
     myInfo() {
       return this.initData.myInfo;
+    },
+    myProps() {
+      return this.initData.myProps || [];
     },
     pets() {
       return this.initData.pets || [];

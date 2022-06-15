@@ -13,17 +13,20 @@
     <span title="我的背包" @click.stop="togglePlane('bag', true)">&#xe769;</span>
     <span title="商店" @click.stop="togglePlane('shop', true)">&#xe697;</span>
     </div>
+    <Chat v-if="pet.isMine && level>0" :initData="initData"></Chat>
   </div>
 </template>
 
 <script>
-import { shallowReactive, ref } from 'vue';
-import Cat1 from '@components/cat/Cat1.vue'
-import Dog1 from '@components/dog/Dog1.vue'
-import Rabbit1 from '@components/rabbit/Rabbit1.vue'
-import Dog2 from '@components/dog/Dog2.vue'
-import Rabbit2 from '@components/rabbit/Rabbit2.vue'
-import NoPet from '@components/no-pet/NoPet.vue'
+import { shallowReactive, ref, defineAsyncComponent } from 'vue';
+const Cat1 = defineAsyncComponent(() => import('@components/cat/Cat1.vue'));
+const Cat2 = defineAsyncComponent(() => import('@components/cat/Cat2.vue'));
+const Dog1 = defineAsyncComponent(() => import('@components/dog/Dog1.vue'));
+const Dog2 = defineAsyncComponent(() => import('@components/dog/Dog2.vue'));
+const Rabbit1 = defineAsyncComponent(() => import('@components/rabbit/Rabbit1.vue'));
+const Rabbit2 = defineAsyncComponent(() => import('@components/rabbit/Rabbit2.vue'));
+const NoPet = defineAsyncComponent(() => import('@components/no-pet/NoPet.vue'));
+const Chat = defineAsyncComponent(() => import('./Chat.vue'));
 import { petType, getLevel, getPetStage } from '@config/data.js'
 import emitter from 'tiny-emitter/instance';
 
@@ -33,7 +36,7 @@ const setPetComponent = (type, level) => {
   stage = stage > 1 ? 2 : 1;
   switch (type) {
     case petType.cat:
-      curCom = 'Cat' + 1;
+      curCom = 'Cat' + stage;
       break;
     case petType.dog:
       curCom = 'Dog' + stage;
@@ -50,8 +53,8 @@ const setPetComponent = (type, level) => {
 }
 
 export default {
-  components: { NoPet, Cat1, Dog1, Rabbit1, Dog2, Rabbit2 },
-  props: ['pet'],
+  components: { NoPet, Cat1, Dog1, Rabbit1, Dog2, Rabbit2, Chat },
+  props: ['pet', 'initData'],
   computed: {
     petComponent() {
       return setPetComponent(this.pet.type, this.level)

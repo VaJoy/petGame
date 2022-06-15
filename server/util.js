@@ -22,6 +22,20 @@ export function errorHandler(err, codeType, callback) {
     return err;
 }
 
+export function rollbackHandler(connection, err, errorType, callback) {
+    connection.rollback(() => {
+        errorHandler(err, errorType, callback);
+    });
+}
+
+export function generateEffectSql(effect) {
+    let sql = '';
+    for (let featrue in effect) {
+        sql += `\`${featrue}\`=(\`${featrue}\`+${effect[featrue]}),`
+    }
+    return sql.replace(/,$/, '');
+}
+
 const secret = salt.toString("hex");
 
 export function cryptPassword(password) {

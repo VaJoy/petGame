@@ -3,7 +3,10 @@ import session from 'express-session';
 import sessionFileStore from 'session-file-store';
 import rateLimit from 'express-rate-limit'
 import { codes } from '../config/codes.js';
-import { login, modifyPassword, getInitData, initEgg, reward, markEvent, endWorking } from './query.js';
+import {
+    login, modifyPassword, getInitData, initEgg, attack,
+    reward, markEvent, endWorking, buyProp, useProp
+} from './query.js';
 import cors from 'cors';
 import bodyParser from 'body-parser'
 
@@ -22,10 +25,10 @@ app.use(cors({
 }));
 
 const limiter = rateLimit({
-	windowMs: 60 * 1000,
-	max: 30,
-	standardHeaders: true,
-	legacyHeaders: false,
+    windowMs: 60 * 1000,
+    max: 30,
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 
 app.use(limiter)
@@ -88,6 +91,24 @@ app.post('/mark-event', function (req, res) {
 
 app.post('/end-working', function (req, res) {
     endWorking(req, (json) => {
+        res.json(json);
+    })
+});
+
+app.post('/buy-prop', function (req, res) {
+    buyProp(req, (json) => {
+        res.json(json);
+    })
+});
+
+app.post('/attack', function (req, res) {
+    attack(req, (json) => {
+        res.json(json);
+    })
+});
+
+app.post('/use-prop', function (req, res) {
+    useProp(req, (json) => {
         res.json(json);
     })
 });

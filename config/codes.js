@@ -6,4 +6,7 @@ export const codes = {
     limitedAccess: 4,
     clientError: 5,
     rewardOpError: 6,
+    buyOpError: 7,
+    useOpError: 8,
+    attackOpError: 9
 }
