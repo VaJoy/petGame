@@ -46,6 +46,11 @@ html, body, div, span, applet, object, iframe,
    font-family: "Arial", "Microsoft YaHei", "微软雅黑", sans-serif;
    font-size: 14px;
    -webkit-font-smoothing: antialiased;
+   -webkit-tap-highlight-color: transparent;
+ }
+
+ a:focus,input:focus,p:focus,div:focus,canvas:focus{
+  outline: none;
  }
 
  .clearfix:before,
