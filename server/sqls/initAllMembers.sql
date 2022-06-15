@@ -26,3 +26,6 @@ VALUES ("奈奈生", 0);
 
 INSERT INTO users (name, coin)
 VALUES ("顏菁大美女", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("666", 0);

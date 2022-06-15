@@ -5,6 +5,7 @@ import rateLimit from 'express-rate-limit'
 import { codes } from '../config/codes.js';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import https from 'https';
 import http from 'http';
 import {
@@ -12,10 +13,12 @@ import {
     reward, markEvent, endWorking, buyProp, useProp
 } from './query.js';
 import cors from 'cors';
-import bodyParser from 'body-parser'
+import bodyParser from 'body-parser';
 
-const key = fs.readFileSync(path.resolve('./config/server.key.pem'));
-const cert = fs.readFileSync(path.resolve('./config/server.crt'));
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
+const key = fs.readFileSync(path.resolve(dirname, '../config/server.key.pem'));
+const cert = fs.readFileSync(path.resolve(dirname, '../config/server.crt'));
 const FileStore = sessionFileStore(session);
 const app = express();
 const identityKey = 'studyroom2022';
@@ -37,32 +40,36 @@ const limiter = rateLimit({
     legacyHeaders: false,
 });
 
-app.use(limiter)
+app.use(express.static(path.resolve(dirname, '../dist')));
 
+app.use(limiter);
 app.use(session({
     name: identityKey,
     secret: identityKey,
     store: new FileStore(),
-    sameSite: 'none',
-    cookie: ('name', 'value', { path: '/', httpOnly: true, secure: false, maxAge: 60000 * 24 * 90 }),
+    cookie: { path: '/', 
+    // 跨域的话 https 证书必须 CA 认证，自签证书没戏，
+    // 会被浏览器视为不安全，secure 配置无法生效，sameSite 也因此失效
+    // secure: true, sameSite: 'none', 
+    httpOnly: true, secure: false, maxAge: 60000 * 24 * 90 },
     resave: false,
     rolling: true,
     saveUninitialized: false,
 }));
 
-app.get('/', function (req, res, next) {
+app.get('/', function (req, res) {
     const sess = req.session
     const { id } = sess;
     res.send(`<p>${id}</p>`);
 });
 
-app.post('/login', function (req, res, next) {
+app.post('/login', function (req, res) {
     login(req, (json) => {
         res.json(json);
     })
 });
 
-app.post('/logout', function (req, res, next) {
+app.post('/logout', function (req, res) {
     req.session.destroy(function (err) {
         const json = {
             err,
@@ -72,7 +79,7 @@ app.post('/logout', function (req, res, next) {
     });
 });
 
-app.post('/modify-password', function (req, res, next) {
+app.post('/modify-password', function (req, res) {
     modifyPassword(req, (json) => {
         res.json(json);
     })
@@ -126,6 +133,5 @@ app.get('/reward', function (req, res) {
     })
 });
 
-app.set('port', 2022);
 http.createServer(app).listen(2022);
-https.createServer({ key, cert}, app).listen(2023);
+// https.createServer({ key, cert}, app).listen(2023);

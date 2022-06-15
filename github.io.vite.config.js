@@ -15,8 +15,8 @@ const renameIndexPlugin = (newFilename) => {
     name: 'renameIndex',
     enforce: 'post',
     generateBundle(options, bundle) {
-      for (var b in bundle) {
-        if (b.lastIndexOf('index.html') > -1) {
+      for(var b in bundle) {
+        if(b.lastIndexOf('index.html') > -1) {
           bundle[b].fileName = newFilename
         }
       }
@@ -53,7 +53,7 @@ export default defineConfig(({ mode }) => {
       ]
     },
     build: {
-      // outDir: dirname,
+      outDir: dirname,
       rollupOptions: {
         root: path.resolve(dirname, 'src'),
         input: {

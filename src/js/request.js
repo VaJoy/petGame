@@ -1,6 +1,6 @@
 import { codes } from '@config/codes.js';
 import emitter from 'tiny-emitter/instance';
-const url = __IS_DEV__ ? 'http://localhost:2022' : 'https://localhost:2023';
+const url = __IS_DEV__ ? 'http://localhost:2022' : 'http://localhost:2022';
 
 
 export const request = (function () {
