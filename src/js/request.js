@@ -61,6 +61,7 @@ export const request = (function () {
 
 export const getInitData = (callback, silent) => {
     if (location.hostname === 'vajoy.github.io') {
+        emitter.emit('request/loading', false);
         return callback(getInitMorkData());
     }
 
