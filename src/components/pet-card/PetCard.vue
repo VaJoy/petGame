@@ -53,7 +53,7 @@ const setPetComponent = (type, level) => {
 }
 
 export default {
-  components: { NoPet, Cat1, Dog1, Rabbit1, Dog2, Rabbit2, Chat },
+  components: { NoPet, Cat1, Cat2, Dog1, Rabbit1, Dog2, Rabbit2, Chat },
   props: ['pet', 'initData'],
   computed: {
     petComponent() {
