@@ -1,4 +1,5 @@
 import { codes } from '@config/codes.js';
+import { getInitMorkData } from '@config/data.js';
 import emitter from 'tiny-emitter/instance';
 const url = __IS_DEV__ ? 'http://localhost:2022' : 'http://localhost:2022';
 
@@ -59,6 +60,10 @@ export const request = (function () {
 
 
 export const getInitData = (callback, silent) => {
+    if (location.hostname === 'vajoy.github.io') {
+        return callback(getInitMorkData());
+    }
+
     request('get-init-data', {}, callback, silent);
 }
 
