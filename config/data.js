@@ -14,6 +14,19 @@ export const eventType = {
     enhance: 4,  // 喝药水增强
 }
 
+export function getDailyAttackTimes(level) {
+    let times = 0;
+    if (level >= 15) {
+        times = 5;
+    } else if (level >= 10) {
+        times = 3;
+    } else if (level >= 5) {
+        times = 2;
+    }
+
+    return times;
+}
+
 export const levels = [
     { level: 1, exp: 10 },
     { level: 2, exp: 20 },

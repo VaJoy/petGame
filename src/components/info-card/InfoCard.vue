@@ -81,10 +81,12 @@ export default {
             if (data.code !== codes.ok) {
               return alert(data.err);
             }
-
+            
+            let msg = data.isSuccess === 0 ? '你的宝宝还不够强大，没打赢对方 :(' : 
+            ('攻击成功，' + (data.gainCoins > 0 ? `从${name}身上抢走了 ${data.gainCoins} 金币` : `但${name}实在太穷了，你没有抢到金币`));
             emitter.emit('request/reload');
 
-            alert('攻击成功');
+            alert(msg);
           });
         }
       }

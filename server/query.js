@@ -1,8 +1,14 @@
 import mysql from 'mysql';
 import { password, adminId } from './secret.js';
 import { codes } from '../config/codes.js';
-import { errorHandler, cryptPassword, arrangePet, sqlFilter, getRandomNum, rollbackHandler, generateEffectSql } from './util.js';
-import { petType, rewardsMap, eventType, getLevel, getUpdateReward, shopProps, getPropEffect } from '../config/data.js';
+import {
+    errorHandler, cryptPassword, arrangePet, sqlFilter, getRandomNum,
+    rollbackHandler, generateEffectSql
+} from './util.js';
+import {
+    petType, rewardsMap, eventType, getLevel, getUpdateReward,
+    shopProps, getPropEffect, getDailyAttackTimes
+} from '../config/data.js';
 import moment from 'moment';
 
 const connection = mysql.createConnection({
@@ -114,10 +120,14 @@ export function attack(req, callback) {
     const { body, session } = req;
     const target = body?.target | 0;
     const userId = session.user_id | 0;
+    const today = moment().format('yyyy-MM-DD');
 
     connection.query(`SELECT a.coin, b.* from users a left join pets b on b.user_id=a.id
     where a.session_id="${sqlFilter(session.id)}" and a.id=${userId};
-    select a.*, b.coin from pets a left join users b on a.user_id=b.id where a.user_id=${target}`,
+    select a.*, b.coin from pets a left join users b on a.user_id=b.id where a.user_id=${target};
+    select count(1) as times from events where user_id=${userId} and c_date='${today}' and type=${eventType.attack};
+    select max(id) as id from events;
+    `,
         function (error, results) {
             if (error || !results[0]?.length || !results[1]?.length) {
                 return errorHandler(error || '参数错误', 'attackOpError', callback);
@@ -125,9 +135,57 @@ export function attack(req, callback) {
 
             const userInfo = results[0][0];
             const targetInfo = results[1][0];
+            const attackTimes = results[2][0]?.times || 0;
+            const newEventId = (results[3][0]?.id || 0) + 1;
+            const userLevel = getLevel(userInfo.exp + userInfo.sign_exp);
+            const dailyAttackTimes = getDailyAttackTimes(userLevel);
+            const random1 = getRandomNum(8, 12) / 10;
+            const random2 = getRandomNum(8, 12) / 10;
+            const random3 = getRandomNum(8, 12) / 10;
+            const randomAgilityResult = getRandomNum(0, 100);
+            let isSuccess = 0;
+            let gainCoins = 0;
 
-            console.log(userInfo, targetInfo);
-            callback({code: codes.ok});
+            if (attackTimes >= dailyAttackTimes) {
+                return errorHandler('攻击失败，你的宝宝今天攻击的次数已达上限', callback);
+            }
+
+            let agilityPercent = (targetInfo.agility - userInfo.agility) * random1;
+            agilityPercent = agilityPercent > 90 ? 90 : agilityPercent;
+
+            if (agilityPercent < randomAgilityResult && userInfo.force * random2 > targetInfo.defence * random3) {
+                isSuccess = 1;
+                const randomCoins = getRandomNum(1, 5);
+                gainCoins = targetInfo.coin <= 10 ? 0 : randomCoins;
+            }
+
+            connection.beginTransaction((err) => {
+                if (err) {
+                    return errorHandler(err, 'attackOpError', callback);
+                }
+
+                let sql = `insert into events (type, user_id, c_time, c_date, success, target_id) 
+                values(${eventType.attack}, ${userId}, ${Date.now()}, '${today}', ${isSuccess}, ${target});`;
+                if(gainCoins > 0) {
+                    sql += `update users set coin=(coin+${gainCoins}) where id=${userId};
+                    update users set coin=(coin-${gainCoins}) where id=${target};
+                    insert into awards (num,name,event_id) values (${gainCoins},'金币',${newEventId});`
+                }
+    
+                connection.query(sql, (error) => {
+                        if (errorHandler(error, 'attackOpError', callback)) {
+                            return;
+                        }
+
+                        connection.commit((err) => {
+                            if (err) {
+                                return rollbackHandler(connection, err, 'attackOpError', callback);
+                            }
+    
+                            callback({ code: codes.ok, gainCoins, isSuccess });
+                        });
+                    });
+            });
         }
     );
 }

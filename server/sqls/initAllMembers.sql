@@ -7,7 +7,7 @@ INSERT INTO users (name, coin)
 VALUES ("月夜猫 Jiner", 0);
 
 INSERT INTO users (name, coin)
-VALUES ("忆然特雷西", 0);
+VALUES ("忆燃特雷西", 0);
 
 INSERT INTO users (name, coin)
 VALUES ("雨三", 0);

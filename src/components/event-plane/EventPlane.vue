@@ -54,7 +54,7 @@ export default {
       const myId = showNick || this.userMap.mine;
       const { user_id, target_id, award_num } = item;
       const userName = user_id === myId ? '我' : `「${this.userMap[user_id] || ''}」`;
-      const targetName = user_id === myId ? '我' : `「${this.userMap[target_id] || ''}」`;
+      const targetName = target_id === myId ? '我' : `「${this.userMap[target_id] || ''}」`;
 
       switch(item.type) {
         case eventType.attack:
