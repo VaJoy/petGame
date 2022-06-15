@@ -5,14 +5,23 @@ const url = __IS_DEV__ ? 'http://localhost:2022' : 'http://localhost:2022';
 
 export const request = (function () {
     const requestRecord = {};
-    const toggleState = (route, state) => {
-        requestRecord[route] = state;
-        emitter.emit('request/loading', state);
+    const requestId = {};
+    const toggleState = (route, state, silent) => {
+        if (!silent) {
+            requestRecord[route] = state;
+            emitter.emit('request/loading', state);
+        }
+        
+        if (state) {
+            const id = (requestId[route] || 0) + 1;
+            requestId[route] = id;
+            return id;
+        }
     }
 
     return (route, body = {}, callback, silent) => {
         if (requestRecord[route]) return;
-        silent || toggleState(route, true);
+        const id = toggleState(route, true, silent);
 
         fetch(`${url}/${route}`, {
             credentials: "include",
@@ -30,7 +39,8 @@ export const request = (function () {
                 throw new Error('请求失败');
             })
             .then((data) => {
-                silent || toggleState(route, false);
+                if (requestId[route] !== id) return;
+                toggleState(route, false, silent);
                 if (typeof data.err === 'object') {
                     data.err = JSON.stringify(data.err);
                 }
@@ -38,7 +48,7 @@ export const request = (function () {
                 callback(data);
             })
             .catch((err) => {
-                silent || toggleState(route, false);
+                toggleState(route, false, silent);
                 callback({
                     err,
                     code: codes.clientError

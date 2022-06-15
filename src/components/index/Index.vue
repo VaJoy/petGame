@@ -1,11 +1,11 @@
 <template>
   <div class="pets-wrap" @click="clickWrap">
-    <PetCard v-for="(pet, index) in initData?.pets" :pet="pet" :key="`pet-${pet.id}`" 
-      :initData="initData"></PetCard>
+    <PetCard v-for="(pet, index) in initData?.pets" :pet="pet" :key="`pet-${pet.id}`" :initData="initData"></PetCard>
     <Login v-if="isInitRequestDone && !hasLogined && !isRequesting"></Login>
     <ChoosePet v-if="isInitRequestDone && hasLogined && !hasPet && !isRequesting"></ChoosePet>
     <WorkPlane v-if="planeState.work" :myLevel="myLevel"></WorkPlane>
-    <EventPlane v-if="planeState.event" :userMap="userMap" :events="initData.events" :myEvents="initData.myEvents"></EventPlane>
+    <EventPlane v-if="planeState.event" :userMap="userMap" :events="initData.events" :myEvents="initData.myEvents">
+    </EventPlane>
     <RankPlane v-if="planeState.rank" :pets="pets" :userMap="userMap" :attacks="attacks"></RankPlane>
     <ShopPlane v-if="planeState.shop" :myInfo="myInfo"></ShopPlane>
     <BagPlane v-if="planeState.bag" :myInfo="myInfo" :myProps="myProps"></BagPlane>
@@ -37,17 +37,17 @@ let isRequesting = ref(true);
 let isInitRequestDone = ref(false);
 const infoCard = reactive({ isShow: false, pet: {}, axis: {} });
 
-const initOrResetData = () => {
+const initOrResetData = (silent) => {
   getInitData((data) => {
     if (data.code !== codes.ok) {
       alert(data.err);
       return;
     }
 
-    console.log(data);
+    // console.log(data);
     initData = Object.assign(initData, data);
     isInitRequestDone.value = true;
-  });
+  }, silent);
 }
 
 emitter.on('request/loading', (state) => {
@@ -74,19 +74,6 @@ emitter.on('index/click-pet', (pet) => {
 
 export default {
   components: { PetCard, InfoCard, Login, Loading, ChoosePet, WorkPlane, EventPlane, BagPlane, ShopPlane, RankPlane },
-  setup() {
-    initOrResetData();
-    return {
-      initData,
-      isRequesting,
-      isInitRequestDone,
-      planeState,
-      infoCard,
-      clickWrap() {
-        infoCard.isShow = false;
-      }
-    }
-  },
   computed: {
     myInfo() {
       return this.initData.myInfo;
@@ -127,6 +114,29 @@ export default {
       return level;
     }
   },
+  setup() {
+    initOrResetData();
+    return {
+      initData,
+      isRequesting,
+      isInitRequestDone,
+      planeState,
+      infoCard,
+      clickWrap() {
+        infoCard.isShow = false;
+      }
+    }
+  },
+  mounted() {
+    const reset = () => {
+      setTimeout(() => {
+        initOrResetData(true);
+        reset();
+      }, 60000);
+    }
+
+    reset();
+  }
 }
 </script>
 

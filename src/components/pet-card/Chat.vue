@@ -93,7 +93,7 @@ export default {
     }
 
     this.msg = msg;
-    setTimeout(this.loopChat, 1000);
+    setTimeout(this.loopChat, 2000);
   }
 }
 </script>
