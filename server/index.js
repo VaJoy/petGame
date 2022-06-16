@@ -17,8 +17,8 @@ import bodyParser from 'body-parser';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
-const key = fs.readFileSync(path.resolve(dirname, '../config/server.key.pem'));
-const cert = fs.readFileSync(path.resolve(dirname, '../config/server.crt'));
+const key = fs.readFileSync(path.resolve(dirname, '../config/localhost.key'));
+const cert = fs.readFileSync(path.resolve(dirname, '../config/localhost.cert'));
 const FileStore = sessionFileStore(session);
 const app = express();
 const identityKey = 'studyroom2022';
@@ -134,4 +134,4 @@ app.get('/reward', function (req, res) {
 });
 
 http.createServer(app).listen(2022);
-// https.createServer({ key, cert}, app).listen(2023);
+https.createServer({ key, cert}, app).listen(443);
