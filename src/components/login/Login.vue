@@ -15,6 +15,7 @@
 import { login, modifyPassword } from '@js/request.js';
 import { codes } from '@config/codes.js'
 import { reload } from '@js/business.js'
+import emitter from 'tiny-emitter/instance';
 
 export default {
   props: [],
@@ -24,7 +25,7 @@ export default {
       const password = this.password.trim();
       const newPassword = this.newPassword.trim();
       if (!id) {
-        return alert('ID 未填写。')
+        return emitter.emit('dialog/alert', 'ID 未填写。')
       }
 
       const data = {
@@ -34,7 +35,7 @@ export default {
         if (json.code === codes.ok) {
           reload();
         } else {
-          alert(`[${json.code}] ${json.err || '登录失败，请截图联系 vj 处理。'}`)
+          emitter.emit('dialog/alert', `[${json.code}] ${json.err || '登录失败，请截图联系 vj 处理。'}`)
         }
       }
 

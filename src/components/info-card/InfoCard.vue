@@ -68,27 +68,27 @@ export default {
       },
       levelPercent: ((total_exp / nextLevelExp).toFixed(2) * 100) + '%',
       clickAttack() {
-        if (this.myLevel < 5) {
-          return alert('宝宝 5 级后才能发动攻击哦。');
+        if (props.myLevel < 5) {
+          return emitter.emit('dialog/alert', '宝宝 5 级后才能发动攻击哦。');
         }
 
         if (total_exp < levels[2].exp) {
-          return alert('该宝宝还小，就别欺负它了。');
+          return emitter.emit('dialog/alert', '该宝宝还小，就别欺负它了。');
         }
 
-        if (confirm(`确定攻击${name}的宝宝么？`)) {
+        emitter.emit('dialog/confirm', `确定攻击${name}的宝宝么？`, () => {
           attack({ target: props.pet.user_id }, (data) => {
             if (data.code !== codes.ok) {
-              return alert(data.err);
+              return emitter.emit('dialog/alert', data.err);
             }
             
             let msg = data.isSuccess === 0 ? '你的宝宝还不够强大，没打赢对方 :(' : 
             ('攻击成功，' + (data.gainCoins > 0 ? `从${name}身上抢走了 ${data.gainCoins} 金币` : `但${name}实在太穷了，你没有抢到金币`));
             emitter.emit('request/reload');
 
-            alert(msg);
+            emitter.emit('dialog/alert', msg);
           });
-        }
+        });
       }
     }
   },

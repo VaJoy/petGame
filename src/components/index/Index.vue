@@ -11,6 +11,7 @@
     <BagPlane v-if="planeState.bag" :myInfo="myInfo" :myProps="myProps"></BagPlane>
     <InfoCard :pet="infoCard.pet" :axis="infoCard.axis" :myLevel="myLevel" v-if="infoCard.isShow"></InfoCard>
     <Loading v-if="isRequesting"></Loading>
+    <Dialog></Dialog>
   </div>
 </template>
 
@@ -29,6 +30,7 @@ import EventPlane from '../event-plane/EventPlane.vue';
 import RankPlane from '../rank-plane/RankPlane.vue';
 import BagPlane from '../bag-plane/BagPlane.vue';
 import ShopPlane from '../shop-plane/ShopPlane.vue';
+import Dialog from '../dialog/Dialog.vue';
 import { getLevel } from '@config/data.js'
 
 let initData = reactive({});
@@ -40,7 +42,7 @@ const infoCard = reactive({ isShow: false, pet: {}, axis: {} });
 const initOrResetData = (silent) => {
   getInitData((data) => {
     if (data.code !== codes.ok) {
-      alert(data.err);
+      emitter.emit('dialog/alert', data.err);
       return;
     }
 
@@ -73,7 +75,10 @@ emitter.on('index/click-pet', (pet) => {
 });
 
 export default {
-  components: { PetCard, InfoCard, Login, Loading, ChoosePet, WorkPlane, EventPlane, BagPlane, ShopPlane, RankPlane },
+  components: {
+    PetCard, InfoCard, Login, Loading, ChoosePet, WorkPlane,
+    EventPlane, BagPlane, ShopPlane, RankPlane, Dialog
+  },
   computed: {
     myInfo() {
       return this.initData.myInfo;

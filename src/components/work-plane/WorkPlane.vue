@@ -50,7 +50,7 @@ export default {
         if (json.code === codes.ok) {
           this.startToWork();
         } else {
-          alert(json.err || '打工请求失败，请稍后重试');
+          emitter.emit('dialog/alert', json.err || '打工请求失败，请稍后重试');
         }
       })
     },
@@ -67,10 +67,10 @@ export default {
             if (json.code === codes.ok) {
               localStorage.setItem('last-work-date', moment().format('yyyy-MM-DD'));
               emitter.emit('request/reload');
-              alert(`打工完成，获得 ${json.coins} 金币奖励！`);
+              emitter.emit('dialog/alert', `打工完成，获得 ${json.coins} 金币奖励！`);
             } else {
               console.log(json.err);
-              alert(json.err || '打工失败，请截图联系 VJ。');
+              emitter.emit('dialog/alert', json.err || '打工失败，请截图联系 VJ。');
             }
           });
           this.closePlane();
@@ -85,7 +85,7 @@ export default {
         this.unmountMonitor();
         this.closePlane();
         setTimeout(() => {
-          alert('你离开了打工界面，打工失败');
+          emitter.emit('dialog/alert', '你离开了打工界面，打工失败');
         }, 10);
       }
     },

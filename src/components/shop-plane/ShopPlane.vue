@@ -42,20 +42,20 @@ export default {
     },
     clickBuy(item) {
       if (item.price > this.myInfo.coin) {
-        return alert('你的金币不够哦 :(');
+        return emitter.emit('dialog/alert', '你的金币不够哦 :(');
       }
 
-      if (confirm(`确定花费 ${item.price} 金币购买「${item.name}」么？`)) {
+      emitter.emit('dialog/confirm', `确定花费 ${item.price} 金币购买「${item.name}」么？`, () => {
         buyProp(item, (data) => {
           if (data.code !== codes.ok) {
-            return alert(data.err);
+            return emitter.emit('dialog/alert', data.err);
           }
 
           emitter.emit('request/reload');
 
-          alert('购买成功，快去背包使用吧');
+          emitter.emit('dialog/alert', '购买成功，快去背包使用吧');
         })
-      }
+      });
     },
   },
 }

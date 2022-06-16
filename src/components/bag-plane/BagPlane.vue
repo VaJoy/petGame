@@ -50,14 +50,14 @@ export default {
     useProp(item) {
       useProp(item, (data) => {
         if (data.code !== codes.ok) {
-          return alert(data.err);
+          return emitter.emit('dialog/alert', data.err);
         }
 
         emitter.emit('request/reload');
 
         const effectStr = getEffectStr(data.effect);
 
-        alert('使用道具成功，宝宝的' + effectStr);
+        emitter.emit('dialog/alert', '使用道具成功，宝宝的' + effectStr);
       })
     },
     closePlane() {
