@@ -1,7 +1,7 @@
 import { codes } from '@config/codes.js';
 import { getInitMorkData } from '@config/data.js';
 import emitter from 'tiny-emitter/instance';
-const url = __IS_DEV__ ? 'http://localhost:2022' : 'https://34.212.39.186:433';
+const url = __IS_DEV__ ? 'http://localhost' : 'https://vajoy.icu';
 
 
 export const request = (function () {
