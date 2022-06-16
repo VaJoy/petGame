@@ -49,7 +49,7 @@ app.use(session({
     secret: identityKey,
     store: new FileStore(),
     cookie: { path: '/', 
-    secure: true, sameSite: 'none', 
+    // secure: true, sameSite: 'none', 
     httpOnly: true, secure: false, maxAge: 60000 * 24 * 90 },
     resave: false,
     rolling: true,
