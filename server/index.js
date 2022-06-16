@@ -17,8 +17,8 @@ import bodyParser from 'body-parser';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
-const key = fs.readFileSync(path.resolve(dirname, '../config/localhost.key'));
-const cert = fs.readFileSync(path.resolve(dirname, '../config/localhost.cert'));
+const key = fs.readFileSync(path.resolve(dirname, '../config/vajoy.icu.key'));
+const cert = fs.readFileSync(path.resolve(dirname, '../config/vajoy.icu.csr'));
 const FileStore = sessionFileStore(session);
 const app = express();
 const identityKey = 'studyroom2022';
