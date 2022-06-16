@@ -703,14 +703,14 @@ var AdobeAn = {};
         
             // 头
             this.instance_3 = new lib.头部();
-            this.instance_3.setTransform(60,-36.45,0.7187,0.7187,0,0,0,-1.2,37.1);
+            this.instance_3.setTransform(60,-36.45,0.6503,0.6503,0,0,0,-1.1,37);
         
-            this.timeline.addTween(cjs.Tween.get(this.instance_3).to({regX:-1.1,regY:37,rotation:-1.2507,x:61.05,y:-36.5},32).to({regX:-1.2,regY:37.1,rotation:2.5214,x:59.05,y:-36.45},58).to({rotation:0,x:60},39).wait(1));
+            this.timeline.addTween(cjs.Tween.get(this.instance_3).to({regY:36.9,rotation:-5.973,y:-36.55},30).to({regY:37,rotation:0,y:-36.45},37).to({regX:-1,regY:36.9,rotation:6.9743,x:60.05,y:-36.55},36).to({regX:-1.1,regY:37,rotation:0,x:60,y:-36.45},26).wait(1));
         
             this._renderFirstFrame();
         
         }).prototype = p = new cjs.MovieClip();
-        p.nominalBounds = new cjs.Rectangle(-9,-166.6,135.1,219.1);
+        p.nominalBounds = new cjs.Rectangle(-9,-157.6,138.1,210.1);
         
         
         // stage content:
@@ -740,7 +740,7 @@ var AdobeAn = {};
             this._renderFirstFrame();
         
         }).prototype = p = new lib.AnMovieClip();
-        p.nominalBounds = new cjs.Rectangle(333.5,449.7,-66.19999999999999,2.1999999999999886);
+        p.nominalBounds = new cjs.Rectangle(333.5,459.1,-64.60000000000002,-7.2000000000000455);
         // library properties:
         lib.properties = {
             id: 'AA504AE6CDFB074B8B319F65E468829A',
