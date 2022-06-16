@@ -45,13 +45,15 @@ app.use(express.static(path.resolve(dirname, '../dist')));
 
 app.use(limiter);
 app.use(session({
-    name: identityKey,
+    name: 'sessionId',
     secret: identityKey,
     store: new FileStore(),
     cookie: {
+        path: '/',
         secure: true,
         sameSite: 'none',
-        httpOnly: true, secure: false, maxAge: 60000 * 24 * 90
+        httpOnly: true,
+        maxAge: 60000 * 24 * 90
     },
     resave: false,
     rolling: true,
@@ -65,6 +67,7 @@ app.get('/', function (req, res) {
 });
 
 app.post('/login', function (req, res) {
+    //res.cookie(name, value [, options]);
     login(req, (json) => {
         res.json(json);
     })
