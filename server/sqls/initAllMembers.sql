@@ -29,3 +29,21 @@ VALUES ("顏菁大美女", 0);
 
 INSERT INTO users (name, coin)
 VALUES ("666", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("Mahoni", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("vsan", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("Genmer", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("delta1037", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("竹下悠希", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("Erice", 0);
