@@ -134,4 +134,4 @@ app.get('/reward', function (req, res) {
 });
 
 http.createServer(app).listen(2022);
-https.createServer({ key, cert}, app).listen(443);
+//https.createServer({ key, cert}, app).listen(443);
