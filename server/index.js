@@ -17,8 +17,9 @@ import bodyParser from 'body-parser';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
-const key = fs.readFileSync(path.resolve(dirname, '../config/vajoy.icu.key'));
-const cert = fs.readFileSync(path.resolve(dirname, '../config/vajoy.icu.csr'));
+const key = fs.readFileSync(path.resolve(dirname, '../config/vajoy.key.pem'));
+const cert = fs.readFileSync(path.resolve(dirname, '../config/vajoy.csr.pem'));
+const ca = fs.readFileSync(path.resolve(dirname, '../config/vajoy.crt.pem'));
 const FileStore = sessionFileStore(session);
 const app = express();
 const identityKey = 'studyroom2022';
@@ -48,9 +49,7 @@ app.use(session({
     secret: identityKey,
     store: new FileStore(),
     cookie: { path: '/', 
-    // 跨域的话 https 证书必须 CA 认证，自签证书没戏，
-    // 会被浏览器视为不安全，secure 配置无法生效，sameSite 也因此失效
-    // secure: true, sameSite: 'none', 
+    secure: true, sameSite: 'none', 
     httpOnly: true, secure: false, maxAge: 60000 * 24 * 90 },
     resave: false,
     rolling: true,
@@ -134,4 +133,4 @@ app.get('/reward', function (req, res) {
 });
 
 http.createServer(app).listen(80);
-https.createServer({ key, cert}, app).listen(443);
+https.createServer({ key, cert, ca, requestCert: true, rejectUnauthorized: false }, app).listen(443);

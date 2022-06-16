@@ -10,8 +10,6 @@ lerna-debug.log*
 #sql+session
 secret.js
 sessions/
-vajoy.icu.key
-vajoy.icu.csr
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
