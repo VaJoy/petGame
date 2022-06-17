@@ -73,7 +73,7 @@ app.post('/login', function (req, res) {
     })
 });
 
-app.post('/logout', function (req, res) {
+app.get('/logout', function (req, res) {
     req.session.destroy(function (err) {
         const json = {
             err,

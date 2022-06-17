@@ -47,3 +47,27 @@ VALUES ("竹下悠希", 0);
 
 INSERT INTO users (name, coin)
 VALUES ("Erice", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("Gru", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("高一", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("Gros", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("招财金元宝", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("张荣幸", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("慕一", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("深度", 0);
+
+INSERT INTO users (name, coin)
+VALUES ("rocky", 0);
