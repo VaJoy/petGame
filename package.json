@@ -6,7 +6,8 @@
     "dev": "vite",
     "github.io.build": "vite build  --config github.io.vite.config.js --base=/petGame/",
     "build": "vite build",
-    "serve": "node server/index.js"
+    "serve": "node server/index.js",
+    "serve-dev": "node server/index.js dev"
   },
   "dependencies": {
     "lodash": "^4.17.21",

@@ -44,17 +44,25 @@ const limiter = rateLimit({
 app.use(express.static(path.resolve(dirname, '../dist')));
 
 app.use(limiter);
+
+const isDev = process.argv.splice(2)[0] === 'dev';
+const cookieOption = {
+    httpOnly: true,
+    maxAge: 60000 * 24 * 90
+}
+
+if (!isDev) {
+    cookieOption = Object.assign(cookieOption, {
+        secure: true,
+        sameSite: 'none',
+    });
+}
+
 app.use(session({
     name: 'sessionId',
     secret: identityKey,
     store: new FileStore(),
-    cookie: {
-        path: '/',
-        secure: true,
-        sameSite: 'none',
-        httpOnly: true,
-        maxAge: 60000 * 24 * 90
-    },
+    cookie: cookieOption,
     resave: false,
     rolling: true,
     saveUninitialized: false,

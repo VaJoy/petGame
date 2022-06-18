@@ -578,7 +578,7 @@ export function modifyPassword(req, callback) {
                 return;
             }
 
-            connection.query(`UPDATE users SET session_id="${req.session.id | 0}",
+            connection.query(`UPDATE users SET session_id="${req.session.id}",
             password="${cryptPassword(newPassword) || ''}" where id=${id}`, function (err) {
                 if (errorHandler(err, 'sqlNativeError', callback)) {
                     return;
