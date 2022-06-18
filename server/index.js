@@ -46,7 +46,7 @@ app.use(express.static(path.resolve(dirname, '../dist')));
 app.use(limiter);
 
 const isDev = process.argv.splice(2)[0] === 'dev';
-const cookieOption = {
+let cookieOption = {
     httpOnly: true,
     maxAge: 60000 * 24 * 90
 }
