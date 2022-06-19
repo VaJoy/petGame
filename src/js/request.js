@@ -84,8 +84,8 @@ export const markEvent = (data, callback) => {
     request('mark-event', data, callback);
 }
 
-export const endWorking = (callback) => {
-    request('end-working', {}, callback);
+export const endWorking = (workType, callback) => {
+    request('end-working', { workType }, callback);
 }
 
 export const buyProp = (data, callback) => {

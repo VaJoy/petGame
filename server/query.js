@@ -192,8 +192,9 @@ export function attack(req, callback) {
 
 
 export function endWorking(req, callback) {
-    const { session } = req;
+    const { body, session } = req;
     const userId = session.user_id | 0;
+    const workType = body?.workType | 0;
     const today = moment().format('yyyy-MM-DD');
     checkLogin(req, false, (error) => {
         if (errorHandler(error, 'limitedAccess', callback)) {
@@ -224,7 +225,7 @@ export function endWorking(req, callback) {
 
                 const timeSpan = Date.now() - (c_time + 3600000);
                 if (Math.abs(timeSpan) <= 60000 * 2) {
-                    const coins = getRandomNum(8, 13);
+                    const coins = getRandomNum(8, 13) + (workType === 1 ? 1 : 0);
                     connection.query(`update users set coin=(coin+${coins}) where id=${userId}; update events set success=1 where id=${id};
                     insert into awards (num, name, event_id) values (${coins}, '金币', ${id})`,
                         (err) => {

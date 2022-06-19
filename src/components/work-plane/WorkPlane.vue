@@ -2,13 +2,18 @@
   <div class="mask-bg">
     <div class="work-plane-wrap dialog-base">
       <h1>{{ title }}</h1>
-      <p v-if="!isWorking && isShow">欢迎来番茄超市打工，每天打工完毕可获得 10 金币奖励。<br>
-        打工过程不可刷新 / 隐藏打工界面，否则会当作偷懒行为中断打工哦。<br>
-        <span class="mr-30 button" @click.stop="clickStartToWork">开始打工</span>
+      <p v-if="!isWorking && isShow">
+      宝宝每天可打工 1 小时，打工完毕可获得 <em>8 ~ 13</em> 随机金币的奖励（专注模式将额外多赚取 <em>1</em> 金币）。<br>
+        <ul>
+          <li>「专注模式打工」：打工过程不可刷新 / 关闭 / 隐藏打工界面。</li>
+          <li>「普通模式打工」：打工过程可以隐藏打工界面，但不能刷新 / 关闭界面。</li>
+        </ul><br>
+        <span class="mr-30 button" @click.stop="clickStartToWork(1)">专注模式打工</span>
+        <span class="mr-30 button" @click.stop="clickStartToWork(0)">普通模式打工</span>
         <span class="button button-light" @click.stop="closePlane">取消</span>
       </p>
       <p v-if="isWorking">
-        打工过程不可刷新 / 隐藏打工界面，否则会当作偷懒行为中断打工哦。
+        {{getWorkDesc()}}
       </p>
       <p v-if="!isShow">
         {{ isDoneToday ? '你的宝宝今天已打工过了，请明天再来吧。' : '你的宝宝还小，请在 1 级后再来吧。' }}<br>
@@ -39,13 +44,15 @@ export default {
   },
   data() {
     return {
+      workType: 1,  // 1-专注模式打工，0-普通模式打工
       isWorking: false,
       restTime: '',
       isDoneToday: false,
     }
   },
   methods: {
-    clickStartToWork() {
+    clickStartToWork(workType) {
+      this.workType = workType;
       markEvent({ type: 'startWorking' }, (json) => {
         if (json.code === codes.ok) {
           this.startToWork();
@@ -63,7 +70,7 @@ export default {
         restTime = restTime.subtract(1, 'seconds');
         this.restTime = restTime.format("HH:mm:ss");
         if (this.restTime === '00:00:00') {
-          endWorking((json) => {
+          endWorking(this.workType, (json) => {
             if (json.code === codes.ok) {
               localStorage.setItem('last-work-date', moment().format('yyyy-MM-DD'));
               emitter.emit('request/reload');
@@ -77,7 +84,16 @@ export default {
         }
       }, 1000);
 
-      this.workMonitor();
+      if (this.workType === 1) {
+        this.workMonitor();
+      }
+    },
+    getWorkDesc() {
+      if(this.workType === 1) {
+        return '专注模式打工中，请不要刷新 / 关闭 / 隐藏打工界面，否则会被当作偷懒行为中断打工。'
+      } else {
+        return '普通模式打工中，打工过程请勿刷新 / 关闭打工界面。'
+      }
     },
     checkVisibility() {
       if (document.hidden) {
