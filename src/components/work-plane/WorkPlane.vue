@@ -5,8 +5,8 @@
       <p v-if="!isWorking && isShow">
         宝宝每天可打工 1 小时，打工完毕可获得 <em>8 ~ 13</em> 随机金币的奖励（专注模式将额外多赚取 <em>1</em> 金币）。<br>
       <ul>
-        <li>「专注模式打工」：打工过程不可刷新 / 关闭 / 隐藏打工界面。</li>
-        <li>「普通模式打工」：打工过程可以隐藏打工界面，但不能刷新 / 关闭界面。</li>
+        <li>「专注模式打工」：打工过程不可刷新 / 关闭 / 隐藏打工页面。</li>
+        <li>「普通模式打工」：打工过程可以隐藏打工页面，但不能刷新 / 关闭页面。</li>
       </ul><br>
       <span class="mr-30 button" @click.stop="clickStartToWork(1)">专注模式打工</span>
       <span class="mr-30 button" @click.stop="clickStartToWork(0)">普通模式打工</span>
@@ -100,9 +100,9 @@ export default {
     },
     getWorkDesc() {
       if (this.workType === 1) {
-        return '专注模式打工中，请不要刷新 / 关闭 / 隐藏打工界面，否则会被当作偷懒行为中断打工。'
+        return '专注模式打工中，请不要刷新 / 关闭 / 隐藏打工页面，否则会被当作偷懒行为中断打工。'
       } else {
-        return '普通模式打工中，打工过程请勿刷新 / 关闭打工界面。'
+        return '普通模式打工中，打工过程请勿刷新 / 关闭打工页面。'
       }
     },
     checkVisibility() {

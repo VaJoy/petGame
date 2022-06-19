@@ -14,6 +14,7 @@ import {
 } from './query.js';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import domain from 'domain';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -24,6 +25,14 @@ const FileStore = sessionFileStore(session);
 const app = express();
 const identityKey = 'studyroom2022';
 
+app.use((req, res, next) => {
+    const req_domain = domain.create();
+    req_domain.on('error', (err) => {
+        console.log(err);
+        res.send(500, err.stack);
+    });
+    req_domain.run(next);
+});
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
