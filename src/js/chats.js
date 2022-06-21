@@ -39,6 +39,7 @@ export const normalChat = [
     '主人那边的天气最近怎么样呀？',
     '我们都要努力成为最棒的自己，加油鸭~',
     '主人有时候也要放松下',
+    '么么哒~',
 ]
 
 export const morningChat = [

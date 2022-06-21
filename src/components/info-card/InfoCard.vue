@@ -13,7 +13,7 @@
 <script>
 import { shallowReactive, ref } from 'vue';
 import emitter from 'tiny-emitter/instance';
-import { getNextLevelExp, levels } from '@config/data.js'
+import { getNextLevelExp, getCurLevelExp, levels } from '@config/data.js'
 import { attack } from '@js/request.js';
 import { codes } from '@config/codes.js';
 
@@ -54,10 +54,12 @@ export default {
     const wrap = ref(null);
     let maxFeatrueVal = 0;
     let nextLevelExp = 0;
+    let curLevelExp = 0;
     const { force, defence, agility, name, total_exp = 0 } = props.pet;
     if (name) {
       maxFeatrueVal = Math.max(force, defence, agility);
       nextLevelExp = getNextLevelExp(total_exp);
+      curLevelExp = getCurLevelExp(total_exp);
     }
 
     return {
@@ -66,7 +68,7 @@ export default {
         const percent = (val / maxFeatrueVal).toFixed(2) * 100;
         return percent + '%';
       },
-      levelPercent: ((total_exp / nextLevelExp).toFixed(2) * 100) + '%',
+      levelPercent: (((total_exp - curLevelExp) / (nextLevelExp - curLevelExp)).toFixed(2) * 100) + '%',
       clickAttack() {
         if (props.myLevel < 5) {
           return emitter.emit('dialog/alert', '宝宝 5 级后才能发动攻击哦。');

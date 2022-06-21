@@ -82,17 +82,26 @@ export const getUpdateReward = (oldLevel, newLevel) => {
     return ret;
 }
 
-export function getNextLevelExp(exp = 0) {
-    const nextLevel = getLevel(exp) + 1;
+function getExpByLevel(level) {
     let ret = 0;
     for (let i = 0, item; item = levels[i]; i++) {
-        if (nextLevel === item.level) {
+        if (level === item.level) {
             ret = item.exp;
             break;
         }
     }
 
     return ret;
+}
+
+export function getNextLevelExp(exp = 0) {
+    const nextLevel = getLevel(exp) + 1;
+    return getExpByLevel(nextLevel);
+}
+
+export function getCurLevelExp(exp = 0) {
+    const level = getLevel(exp);
+    return getExpByLevel(level);
 }
 
 

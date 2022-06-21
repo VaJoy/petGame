@@ -76,9 +76,21 @@ export function buyProp(req, callback) {
         });
 }
 
+function promiseQuery(sql, callback, errorType = codes.error) {
+    return new Promise((resolve, reject) => {
+        connection.query(sql, (err, results) => {
+            if (errorHandler(err, errorType, callback)) {
+                reject(err)
+            } else {
+                resolve(results)
+            }
+        });
+    })
+}
+
 export function useProp(req, callback) {
     const { body, session } = req;
-    checkLogin(req, false, (error) => {
+    checkLogin(req, false, async (error) => {
         if (errorHandler(error, 'limitedAccess', callback)) {
             return;
         }
@@ -88,7 +100,27 @@ export function useProp(req, callback) {
         const userId = session.user_id | 0;
         if (!prop) return errorHandler('找不到该道具', callback);
 
+        const propResult = await promiseQuery(`select count(1) as prop_num from props where is_valid=1 and type=${type};`, callback, 'useOpError');
+        if (!propResult[0]) {
+            return errorHandler('找不到该道具', callback);
+        }
+
         const effect = getPropEffect(type);
+
+        if (effect.exp) {
+            const userResult = await promiseQuery(`select a.exp, a.sign_exp 
+        from pets a left join users b on b.id = a.user_id where b.id=${userId}`, callback, 'useOpError');
+            const ret = userResult[0];
+            const oldLevel = getLevel(ret.exp + ret.sign_exp);
+            const newLevel = getLevel(ret.exp + effect.exp + ret.sign_exp);
+            if (newLevel > oldLevel) {  // 升级处理
+                const rewards = getUpdateReward(oldLevel, newLevel);
+                effect.force = (effect.force || 0) + (rewards.force || 0);
+                effect.defence = (effect.defence || 0) + (rewards.defence || 0);
+                effect.agility = (effect.agility || 0) + (rewards.agility || 0);
+            }
+        }
+
         const effectSql = 'update pets set ' + generateEffectSql(effect) + ` where user_id=${userId};`;
 
         connection.beginTransaction((err) => {
@@ -96,7 +128,7 @@ export function useProp(req, callback) {
                 return errorHandler(err, 'useOpError', callback);
             }
 
-            connection.query(`update props set is_valid=0 where is_valid=1 and type=${type | 0} and user_id=${userId} limit 1; ${effectSql}`,
+            connection.query(`update props set is_valid=0 where is_valid=1 and type=${type} and user_id=${userId} limit 1; ${effectSql}`,
                 (error) => {
                     if (errorHandler(error, 'useOpError', callback)) {
                         return;
@@ -166,25 +198,25 @@ export function attack(req, callback) {
 
                 let sql = `insert into events (type, user_id, c_time, c_date, success, target_id) 
                 values(${eventType.attack}, ${userId}, ${Date.now()}, '${today}', ${isSuccess}, ${target});`;
-                if(gainCoins > 0) {
+                if (gainCoins > 0) {
                     sql += `update users set coin=(coin+${gainCoins}) where id=${userId};
                     update users set coin=(coin-${gainCoins}) where id=${target};
                     insert into awards (num,name,event_id) values (${gainCoins},'金币',${newEventId});`
                 }
-    
+
                 connection.query(sql, (error) => {
-                        if (errorHandler(error, 'attackOpError', callback)) {
-                            return;
+                    if (errorHandler(error, 'attackOpError', callback)) {
+                        return;
+                    }
+
+                    connection.commit((err) => {
+                        if (err) {
+                            return rollbackHandler(connection, err, 'attackOpError', callback);
                         }
 
-                        connection.commit((err) => {
-                            if (err) {
-                                return rollbackHandler(connection, err, 'attackOpError', callback);
-                            }
-    
-                            callback({ code: codes.ok, gainCoins, isSuccess });
-                        });
+                        callback({ code: codes.ok, gainCoins, isSuccess });
                     });
+                });
             });
         }
     );
