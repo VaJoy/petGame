@@ -2,7 +2,7 @@ import { codes } from '../config/codes.js';
 import crypto from 'crypto';
 import { salt } from './secret.js';
 
-export function errorHandler(err, codeType, callback) {
+export function errorHandler(err, codeType, callback = () => {}) {
     if (!err) return;
 
     if (typeof codeType === 'function') {

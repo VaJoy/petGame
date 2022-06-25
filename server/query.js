@@ -19,8 +19,6 @@ const connection = mysql.createConnection({
     multipleStatements: true
 });
 
-let rewardTimestamp;
-
 connection.connect();
 
 export function checkLogin(req, needAdmin, next) {
@@ -306,17 +304,18 @@ export function markEvent(req, callback) {
 export function reward(req, callback) {
     const { query } = req;
     const { top1 = [], top2 = [], top3 = [], score100 = [], sign = [], isImmediate } = JSON.parse(query.data);
+    let rewardTimestamp;
 
-    const handler = () => {
+    const handler = (immediate) => {
         clearInterval(rewardTimestamp);
         checkLogin(req, true, (error) => {
-            if (errorHandler(error, 'limitedAccess', callback)) {
+            if (errorHandler(error, 'limitedAccess', immediate && callback)) {
                 return;
             }
 
             connection.beginTransaction((err) => {
                 if (err) {
-                    return errorHandler(err, 'rewardOpError', callback);
+                    return errorHandler(err, 'rewardOpError', immediate && callback);
                 }
 
                 const promises = [];
@@ -340,22 +339,22 @@ export function reward(req, callback) {
                 Promise.all(promises).then(() => {
                     connection.commit((err) => {
                         if (err) {
-                            return rollbackHandler(connection, err, 'rewardOpError', callback);
+                            return rollbackHandler(connection, err, 'rewardOpError', immediate && callback);
                         }
 
-                        callback({ code: codes.ok });
+                        immediate && callback({ code: codes.ok });
                     });
 
                 }).catch(err => {
                     connection.rollback();
-                    rollbackHandler(connection, err, 'rewardOpError', callback);
+                    rollbackHandler(connection, err, 'rewardOpError', immediate && callback);
                 })
             })
         });
     }
 
     if (isImmediate) {
-        handler()
+        handler(true)
     } else {
         rewardTimestamp = setInterval(() => {
             if (new Date().getHours() === 0) {

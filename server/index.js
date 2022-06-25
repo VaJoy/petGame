@@ -28,8 +28,8 @@ const identityKey = 'studyroom2022';
 app.use((req, res, next) => {
     const req_domain = domain.create();
     req_domain.on('error', (err) => {
-        console.log(err);
-        res.send(500, err.stack);
+        console.log('[domain-error]', err);
+        res.status(500).send(err.stack);
     });
     req_domain.run(next);
 });
