@@ -61,7 +61,7 @@ export default {
       nextLevelExp = getNextLevelExp(total_exp);
       curLevelExp = getCurLevelExp(total_exp);
     }
-console.log('========', total_exp, curLevelExp);
+
     return {
       wrap,
       getPercent(val = 0) {
