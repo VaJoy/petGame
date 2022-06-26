@@ -120,9 +120,9 @@ export function getLevel(exp = 0) {
 
 export const rewardsMap = {
     1: { force: 3, defence: 3, agility: 3, exp: 10, coin: 50 },
-    2: { force: 2, defence: 2, agility: 2, exp: 8, coin: 30 },
-    3: { force: 1, defence: 1, agility: 1, exp: 7, coin: 20 },
-    4: { exp: 5, coin: 10 }
+    2: { force: 2, defence: 2, agility: 2, exp: 9, coin: 40 },
+    3: { force: 2, defence: 2, agility: 2, exp: 8, coin: 40 },
+    4: { force: 1, defence: 1, agility: 1, exp: 7, coin: 30 }
 };
 
 export function getPetStage(level = 0) {
