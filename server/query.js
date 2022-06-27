@@ -253,8 +253,8 @@ export function endWorking(req, callback) {
                     return errorHandler('你的宝宝今天已经打工过了，无法再获得奖励', callback);
                 }
 
-                const timeSpan = Date.now() - (c_time + 3600000);
-                if (Math.abs(timeSpan) <= 60000 * 2) {
+                const timeSpan = Date.now() - c_time;
+                if (timeSpan > 60000 * 55 && timeSpan <= 60000 * 60 * 10) {
                     const coins = getRandomNum(8, 13) + (workType === 1 ? 1 : 0);
                     connection.query(`update users set coin=(coin+${coins}) where id=${userId}; update events set success=1 where id=${id};
                     insert into awards (num, name, event_id) values (${coins}, '金币', ${id})`,
