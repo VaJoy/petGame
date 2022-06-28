@@ -30,6 +30,7 @@ const NoPet = defineAsyncComponent(() => import('@components/no-pet/NoPet.vue'))
 const Chat = defineAsyncComponent(() => import('./Chat.vue'));
 import { petType, getLevel, getPetStage } from '@config/data.js'
 import emitter from 'tiny-emitter/instance';
+import { isGithub } from '@js/util';
 
 const setPetComponent = (type, level) => {
   let curCom;
@@ -54,7 +55,7 @@ const setPetComponent = (type, level) => {
 }
 
 const perfFlag = 'pet-performance';
-const perfVal = Number(localStorage.getItem(perfFlag) || 1);
+const perfVal = isGithub ? 0 : Number(localStorage.getItem(perfFlag) || 1);
 const perf = ref(perfVal);
 
 export default {

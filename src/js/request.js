@@ -1,5 +1,6 @@
 import { codes } from '@config/codes.js';
 import emitter from 'tiny-emitter/instance';
+import { isGithub } from '@js/util';
 const url = __IS_DEV__ ? 'http://localhost' : 'https://vajoy.icu';
 
 
@@ -59,7 +60,7 @@ export const request = (function () {
 
 
 export const getInitData = (callback, silent) => {
-    if (location.hostname === 'localhost') {
+    if (isGithub) {
         import('@config/mockData.js').then(({ getInitMorkData }) => {
             emitter.emit('request/loading', false);
             callback(getInitMorkData());
