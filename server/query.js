@@ -254,7 +254,7 @@ export function endWorking(req, callback) {
                 }
 
                 const timeSpan = Date.now() - c_time;
-                if (timeSpan > 60000 * 55 && timeSpan <= 60000 * 60 * 10) {
+                if (timeSpan > 60000 * 55 && timeSpan <= 60000 * 70) {
                     const coins = getRandomNum(8, 13) + (workType === 1 ? 1 : 0);
                     connection.query(`update users set coin=(coin+${coins}) where id=${userId}; update events set success=1 where id=${id};
                     insert into awards (num, name, event_id) values (${coins}, '金币', ${id})`,

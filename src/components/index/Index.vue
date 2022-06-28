@@ -1,6 +1,7 @@
 <template>
   <div class="pets-wrap" @click="clickWrap">
-    <PetCard v-for="(pet, index) in initData?.pets" :pet="pet" :key="`pet-${pet.id}`" :initData="initData"></PetCard>
+    <PetCard v-for="(pet, index) in initData?.pets" :pet="pet" :index="index"
+    :key="`pet-${pet.id}`" :initData="initData"></PetCard>
     <Login v-if="isInitRequestDone && !hasLogined && !isRequesting"></Login>
     <ChoosePet v-if="isInitRequestDone && hasLogined && !hasPet && !isRequesting"></ChoosePet>
     <WorkPlane v-if="planeState.work" :myLevel="myLevel"></WorkPlane>

@@ -76,6 +76,11 @@
       cursor: pointer;
       transition: background-color .3s;
 
+      &.disabled{
+        background-color: rgb(194, 194, 194);
+        text-shadow: 1px 1px 1px rgb(65, 65, 65);
+      }
+
       &:hover {
         background-color: #ff961d;
       }

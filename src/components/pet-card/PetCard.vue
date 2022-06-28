@@ -1,24 +1,25 @@
 <template>
-  <div class="pet-card-wrap" :class="{'mine': pet.isMine}">
+  <div class="pet-card-wrap" :class="{ 'mine': pet.isMine }">
     <div class="pet-wrap" @click.stop="clickPet">
-      <component :is="petComponent"></component>
+      <component :is="petComponent" :perf="pet.isMine ? 0 : perf"></component>
     </div>
-    <div class="host-name" @click.stop>{{pet.isMine? '我的宝宝' : pet.name}} (v{{level}})</div>
+    <div class="host-name" @click.stop>{{ pet.isMine ? '我的宝宝' : pet.name }} (v{{ level }})</div>
     <div v-if="pet.isMine" class="op-wrap">
       <span title="打工" @click.stop="togglePlane('work', true)">&#xe8f4;</span>
       <span title="消息" @click.stop="togglePlane('event', true)">&#xe604;</span>
       <span title="排行" @click.stop="togglePlane('rank', true)">&#xea06;</span>
     </div>
     <div v-if="pet.isMine" class="op-wrap op-r-wrap">
-    <span title="我的背包" @click.stop="togglePlane('bag', true)">&#xe769;</span>
-    <span title="商店" @click.stop="togglePlane('shop', true)">&#xe697;</span>
+      <span title="我的背包" @click.stop="togglePlane('bag', true)">&#xe769;</span>
+      <span title="商店" @click.stop="togglePlane('shop', true)">&#xe697;</span>
+      <span :title="perfTitle" :class="{disabled: perf}" @click.stop="togglePerformance">&#xe8c5;</span>
     </div>
-    <Chat v-if="pet.isMine && level>0" :initData="initData"></Chat>
+    <Chat v-if="pet.isMine && level > 0" :initData="initData"></Chat>
   </div>
 </template>
 
 <script>
-import { shallowReactive, ref, defineAsyncComponent } from 'vue';
+import { ref, defineAsyncComponent } from 'vue';
 const Cat1 = defineAsyncComponent(() => import('@components/cat/Cat1.vue'));
 const Cat2 = defineAsyncComponent(() => import('@components/cat/Cat2.vue'));
 const Dog1 = defineAsyncComponent(() => import('@components/dog/Dog1.vue'));
@@ -52,15 +53,23 @@ const setPetComponent = (type, level) => {
   return eval(curCom);
 }
 
+const perfFlag = 'pet-performance';
+const perfVal = Number(localStorage.getItem(perfFlag) || 1);
+const perf = ref(perfVal);
+
 export default {
   components: { NoPet, Cat1, Cat2, Dog1, Rabbit1, Dog2, Rabbit2, Chat },
-  props: ['pet', 'initData'],
+  props: ['pet', 'initData', 'index'],
   computed: {
     petComponent() {
       return setPetComponent(this.pet.type, this.level)
+    },
+    perfTitle() {
+      return perf.value ? '关闭性能模式' : '开启性能模式';
     }
   },
   setup(props) {
+
     return {
       level: getLevel(props.pet.total_exp),
       togglePlane(name, state) {
@@ -68,6 +77,12 @@ export default {
       },
       clickPet() {
         emitter.emit('index/click-pet', props.pet);
+      },
+      perf,
+      togglePerformance() {
+        const newPerf = perf.value ^ 1;
+        perf.value = newPerf;
+        localStorage.setItem(perfFlag, newPerf);
       }
     }
   },

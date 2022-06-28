@@ -1,10 +1,8 @@
 <template>
-  <canvas class="pet-canvas"
-        ref="canvas"
-        width="400"
-        height="500"
-        style="display: block; background-color:rgba(255, 255, 255, 0);"
-      ></canvas>
+  <canvas class="pet-canvas" ref="animateCanvas" width="400" height="500" v-show="!perf"
+    style="display: block; background-color:rgba(255, 255, 255, 0);"></canvas>
+  <canvas class="pet-canvas" ref="staticCanvas" width="400" height="500" v-show="perf"
+    style="display: block; background-color:rgba(255, 255, 255, 0);"></canvas>
 </template>
 
 <script>
@@ -35,16 +33,11 @@ function handleComplete(canvasElm, comp) {
   fnStartAnimation();
 }
 
+import { petCompSetup } from '@js/business';
+
 export default {
-  components: {  },
-  props: [],
-  setup() {
-    return {
-    }
-  },
-  mounted() {
-    initAnimate(this.$refs.canvas);
-  },
+  props: ['perf'],
+  setup: petCompSetup(initAnimate)
 }
 </script>
 
@@ -53,3 +46,4 @@ canvas
   width: 4rem
   height: 5rem
 </style>
+
