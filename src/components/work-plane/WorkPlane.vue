@@ -30,6 +30,8 @@ import { markEvent, endWorking } from '@js/request.js';
 import { eventType } from '@config/data.js';
 import { codes } from '@config/codes.js';
 
+let worker;
+
 let timeStamp = null;
 const triggerNotification = (title, msg) => {
   if (window.Notification && Notification.permission !== "denied") {
@@ -74,7 +76,7 @@ export default {
       let restTime = moment("010000", "Hmmss");
       this.restTime = '01:00:00';
 
-      timeStamp = setInterval(() => {
+      this.startWorker(() => {
         restTime = restTime.subtract(1, 'seconds');
         this.restTime = restTime.format("HH:mm:ss");
         if (this.restTime === '00:00:00') {
@@ -92,7 +94,27 @@ export default {
           });
           this.closePlane();
         }
-      }, 1000);
+      });
+
+      // timeStamp = setInterval(() => {
+      //   restTime = restTime.subtract(1, 'seconds');
+      //   this.restTime = restTime.format("HH:mm:ss");
+      //   if (this.restTime === '00:00:00') {
+      //     endWorking(this.workType, (json) => {
+      //       if (json.code === codes.ok) {
+      //         localStorage.setItem('last-work-date', moment().format('yyyy-MM-DD'));
+      //         emitter.emit('request/reload');
+      //         emitter.emit('dialog/alert', `打工完成，获得 ${json.coins} 金币奖励！`);
+      //         triggerNotification('宝宝打工完成', `获得了 ${json.coins} 金币奖励！`);
+      //       } else {
+      //         const errMsg = json.err || '打工失败，请截图联系 VJ。';
+      //         triggerNotification('打工失败', errMsg);
+      //         emitter.emit('dialog/alert', errMsg);
+      //       }
+      //     });
+      //     this.closePlane();
+      //   }
+      // }, 1000);
 
       if (this.workType === 1) {
         this.workMonitor();
@@ -123,6 +145,18 @@ export default {
     unmountMonitor() {
       document.removeEventListener("visibilitychange", this.checkVisibility);
     },
+    startWorker(callback) {
+      const url = new URL('./js/worker.js', import.meta.url).href;
+      worker = new Worker(url);
+      worker.onmessage = callback;
+    },
+    stopWorker() {
+      if (worker.terminate) {
+        worker.terminate();
+      }
+
+      worker = null;
+    },
     closePlane() {
       clearInterval(timeStamp);
       timeStamp = null;
@@ -134,8 +168,12 @@ export default {
     const today = moment().format('yyyy-MM-DD');
     this.isDoneToday = today === lastWorkDate;
   },
+  mounted() {
+    this.startWorker();
+  },
   beforeUnmount() {
     this.unmountMonitor();
+    this.stopWorker();
   }
 }
 </script>
