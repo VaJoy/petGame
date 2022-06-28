@@ -39,42 +39,42 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  div.choose-pet-wrap
-    z-index: 999
-    position: absolute
-    padding: .4rem 1rem
-    left: 50%
-    top: 50%
-    transform: translateY(-50%) translateX(-50%)
+div.choose-pet-wrap
+  z-index: 999
+  position: absolute
+  padding: .4rem 1rem
+  left: 50%
+  top: 50%
+  transform: translateY(-50%) translateX(-50%)
+  display: flex
+  align-items: center
+  justify-content: center
+  flex-direction: column
+  h1
+    font-size: .35rem
+    font-weight: bold
+    color: #F1845F
+  p
+    margin-top: .2rem
     display: flex
-    align-items: center
     justify-content: center
-    flex-direction: column
-    h1
-      font-size: .35rem
-      font-weight: bold
-      color: #F1845F
-    p
-      margin-top: .2rem
-      display: flex
-      justify-content: center
-      label
-        position: relative
-        display: inline-block
-        width: 2rem
-        font-size: .14rem
-        margin-left: .2rem
-        font-size: .26rem
-      input
-        border-radius: 3px
-        border: solid 1px gray
-        outline: none
-        &.new-password
-          background-color: #EEE
-    span.tip
+    label
+      position: relative
+      display: inline-block
+      width: 2rem
       font-size: .14rem
-      margin-top: .2rem
-      color: gray
-    .button
-      margin-top: .4rem
+      margin-left: .2rem
+      font-size: .26rem
+    input
+      border-radius: 3px
+      border: solid 1px gray
+      outline: none
+      &.new-password
+        background-color: #EEE
+  span.tip
+    font-size: .14rem
+    margin-top: .2rem
+    color: gray
+  .button
+    margin-top: .4rem
 </style>

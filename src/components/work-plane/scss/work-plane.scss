@@ -3,7 +3,7 @@
   padding: .5rem;
 
   h1 {
-    color: #F1845F;
+    color: $orange;
     font-size: .6rem;
     text-align: center;
     font-weight: bold;
@@ -15,7 +15,7 @@
     line-height: 2.2;
     text-align: center;
     em {
-      color: #F1845F;
+      color: $orange;
       font-weight: bold;
     }
   }
@@ -35,7 +35,7 @@
         width: .2rem;
         height: .2rem;
         left: 0;
-        background: #F1845F;
+        background: $orange;
       }
     }
   

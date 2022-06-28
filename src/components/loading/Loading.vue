@@ -51,12 +51,11 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .mask-bg
-    display: flex
-    align-items: center
-    justify-content: center
-  canvas
-    width: 200px
-    height: 90px
-    
+.mask-bg
+  display: flex
+  align-items: center
+  justify-content: center
+canvas
+  width: 200px
+  height: 90px
 </style>

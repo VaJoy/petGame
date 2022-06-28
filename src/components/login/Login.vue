@@ -57,45 +57,45 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  div.login-wrap
-    z-index: 999
-    position: absolute
-    padding: .4rem 1rem
-    left: 50%
-    top: 50%
-    transform: translateY(-50%) translateX(-50%)
-    display: flex
-    align-items: center
-    justify-content: center
-    flex-direction: column
-    h1
-      font-size: .35rem
-      font-weight: bold
-      color: #F1845F
-    p
-      margin-top: .2rem
-      label
-        position: relative
-        display: inline-block
-        text-align: right
-        width: 2rem
-        font-size: .14rem
-        margin-right: .2rem
-        margin-left: -1.5rem
-      input
-        padding: .06rem .15rem
-        width: 2.5rem
-        font-size: .12rem
-        border-radius: 3px
-        border: solid 1px gray
-        outline: none
-        &.new-password
-          background-color: #EEE
-    span.tip
+div.login-wrap
+  z-index: 999
+  position: absolute
+  padding: .4rem 1rem
+  left: 50%
+  top: 50%
+  transform: translateY(-50%) translateX(-50%)
+  display: flex
+  align-items: center
+  justify-content: center
+  flex-direction: column
+  h1
+    font-size: .35rem
+    font-weight: bold
+    color: #F1845F
+  p
+    margin-top: .2rem
+    label
+      position: relative
+      display: inline-block
+      text-align: right
+      width: 2rem
       font-size: .14rem
-      margin-top: .2rem
-      color: gray
-    .button
-      margin-top: .4rem
+      margin-right: .2rem
+      margin-left: -1.5rem
+    input
+      padding: .06rem .15rem
+      width: 2.5rem
+      font-size: .12rem
+      border-radius: 3px
+      border: solid 1px gray
+      outline: none
+      &.new-password
+        background-color: #EEE
+  span.tip
+    font-size: .14rem
+    margin-top: .2rem
+    color: gray
+  .button
+    margin-top: .4rem
       
 </style>

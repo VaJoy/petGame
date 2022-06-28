@@ -1,11 +1,11 @@
 <template>
   <div class="mask-bg" v-if="isShow">
     <div class="dialog-wrap dialog-base">
-      <p>{{msg}}</p>
+      <p>{{ msg }}</p>
       <p>
-        <span v-if="type===1" class="button" @click.stop="close">确定</span>
-        <span v-if="type===2" class="button mr-30 button-light" @click.stop="close">取消</span>
-        <span v-if="type===2" class="button" @click.stop="confirm">确定</span>
+        <span v-if="type === 1" class="button" @click.stop="close">确定</span>
+        <span v-if="type === 2" class="button mr-30 button-light" @click.stop="close">取消</span>
+        <span v-if="type === 2" class="button" @click.stop="confirm">确定</span>
       </p>
     </div>
   </div>
@@ -13,7 +13,7 @@
 
 <script>
 import emitter from 'tiny-emitter/instance';
-const noop = () => {};
+const noop = () => { };
 
 export default {
   data() {
@@ -52,16 +52,16 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  div.mask-bg
-    display: flex
-    align-items: center
-    justify-content: center
-    background: transparent
-    .dialog-wrap
-      padding: .7rem 2rem
-      p
-        text-align: center
-      .button
-        display: inline-block
-        margin-top: .5rem
+div.mask-bg
+  display: flex
+  align-items: center
+  justify-content: center
+  background: transparent
+  .dialog-wrap
+    padding: .7rem 2rem
+    p
+      text-align: center
+    .button
+      display: inline-block
+      margin-top: .5rem
 </style>

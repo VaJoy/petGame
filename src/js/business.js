@@ -14,7 +14,7 @@ export const petCompSetup = (initAnimate) => {
             const staticCtx = staticCanvas.value.getContext('2d');
             setTimeout(() => {
                 staticCtx.drawImage(animateCanvas.value, 0, 0);
-            }, 0)
+            }, 300)
         });
 
         return {

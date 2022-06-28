@@ -32,7 +32,6 @@ import { codes } from '@config/codes.js';
 
 let worker;
 
-let timeStamp = null;
 const triggerNotification = (title, msg) => {
   if (window.Notification && Notification.permission !== "denied") {
     Notification.requestPermission(function () {
@@ -96,26 +95,6 @@ export default {
         }
       });
 
-      // timeStamp = setInterval(() => {
-      //   restTime = restTime.subtract(1, 'seconds');
-      //   this.restTime = restTime.format("HH:mm:ss");
-      //   if (this.restTime === '00:00:00') {
-      //     endWorking(this.workType, (json) => {
-      //       if (json.code === codes.ok) {
-      //         localStorage.setItem('last-work-date', moment().format('yyyy-MM-DD'));
-      //         emitter.emit('request/reload');
-      //         emitter.emit('dialog/alert', `打工完成，获得 ${json.coins} 金币奖励！`);
-      //         triggerNotification('宝宝打工完成', `获得了 ${json.coins} 金币奖励！`);
-      //       } else {
-      //         const errMsg = json.err || '打工失败，请截图联系 VJ。';
-      //         triggerNotification('打工失败', errMsg);
-      //         emitter.emit('dialog/alert', errMsg);
-      //       }
-      //     });
-      //     this.closePlane();
-      //   }
-      // }, 1000);
-
       if (this.workType === 1) {
         this.workMonitor();
       }
@@ -151,15 +130,13 @@ export default {
       worker.onmessage = callback;
     },
     stopWorker() {
-      if (worker.terminate) {
+      if (worker && worker.terminate) {
         worker.terminate();
       }
 
       worker = null;
     },
     closePlane() {
-      clearInterval(timeStamp);
-      timeStamp = null;
       emitter.emit('index/toggle-plane-state', 'work', false);
     }
   },
