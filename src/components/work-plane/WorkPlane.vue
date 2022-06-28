@@ -168,9 +168,6 @@ export default {
     const today = moment().format('yyyy-MM-DD');
     this.isDoneToday = today === lastWorkDate;
   },
-  mounted() {
-    this.startWorker();
-  },
   beforeUnmount() {
     this.unmountMonitor();
     this.stopWorker();
