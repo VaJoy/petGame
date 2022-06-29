@@ -183,7 +183,11 @@ export function attack(req, callback) {
             let agilityPercent = (targetInfo.agility - userInfo.agility) * random1;
             agilityPercent = agilityPercent > 90 ? 90 : agilityPercent;
 
-            if (agilityPercent < randomAgilityResult && userInfo.force * random2 > targetInfo.defence * random3) {
+            if (
+                agilityPercent < randomAgilityResult
+                &&
+                userInfo.force * random2 + userInfo.agility * 0.1 > targetInfo.defence * random3 + targetInfo.agility * 0.1
+            ) {
                 isSuccess = 1;
                 const randomCoins = getRandomNum(1, 5);
                 gainCoins = targetInfo.coin <= 10 ? 0 : randomCoins;
