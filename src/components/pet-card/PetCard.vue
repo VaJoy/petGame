@@ -22,10 +22,13 @@
 import { ref, defineAsyncComponent } from 'vue';
 const Cat1 = defineAsyncComponent(() => import('@components/cat/Cat1.vue'));
 const Cat2 = defineAsyncComponent(() => import('@components/cat/Cat2.vue'));
+const Cat3 = defineAsyncComponent(() => import('@components/cat/Cat3.vue'));
 const Dog1 = defineAsyncComponent(() => import('@components/dog/Dog1.vue'));
 const Dog2 = defineAsyncComponent(() => import('@components/dog/Dog2.vue'));
+const Dog3 = defineAsyncComponent(() => import('@components/dog/Dog3.vue'));
 const Rabbit1 = defineAsyncComponent(() => import('@components/rabbit/Rabbit1.vue'));
 const Rabbit2 = defineAsyncComponent(() => import('@components/rabbit/Rabbit2.vue'));
+const Rabbit3 = defineAsyncComponent(() => import('@components/rabbit/Rabbit3.vue'));
 const NoPet = defineAsyncComponent(() => import('@components/no-pet/NoPet.vue'));
 const Chat = defineAsyncComponent(() => import('./Chat.vue'));
 import { petType, getLevel, getPetStage } from '@config/data.js'
@@ -35,7 +38,7 @@ import { isGithub } from '@js/util';
 const setPetComponent = (type, level) => {
   let curCom;
   let stage = getPetStage(level);
-  stage = stage > 1 ? 2 : 1;
+  stage = stage > 2 ? 3 : stage;
   switch (type) {
     case petType.cat:
       curCom = 'Cat' + stage;
@@ -59,7 +62,7 @@ const perfVal = isGithub ? 0 : Number(localStorage.getItem(perfFlag) || 1);
 const perf = ref(perfVal);
 
 export default {
-  components: { NoPet, Cat1, Cat2, Dog1, Rabbit1, Dog2, Rabbit2, Chat },
+  components: { NoPet, Cat1, Cat2, Cat3, Dog1, Rabbit1, Dog2, Dog3, Rabbit2, Rabbit3, Chat },
   props: ['pet', 'initData', 'index'],
   computed: {
     petComponent() {

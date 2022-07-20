@@ -57,7 +57,7 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         root: path.resolve(dirname, 'src'),
         input: {
-          // http://localhost:3001/src/index.html
+          // http://localhost:3000/src/index.html
           main: path.resolve(dirname, 'src', 'index.html'),
         },
       }
