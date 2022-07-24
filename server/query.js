@@ -157,6 +157,7 @@ export function attack(req, callback) {
     select a.*, b.coin from pets a left join users b on a.user_id=b.id where a.user_id=${target};
     select count(1) as times from events where user_id=${userId} and c_date='${today}' and type=${eventType.attack};
     select max(id) as id from events;
+    select count(1) as times from events where target_id=${target} and c_date='${today}' and type=${eventType.attack} and success=1;
     `,
         function (error, results) {
             if (error || !results[0]?.length || !results[1]?.length) {
@@ -167,6 +168,7 @@ export function attack(req, callback) {
             const targetInfo = results[1][0];
             const attackTimes = results[2][0]?.times || 0;
             const newEventId = (results[3][0]?.id || 0) + 1;
+            const targetGetAttackedTimes = results[4][0]?.times || 0;
             const userLevel = getLevel(userInfo.exp + userInfo.sign_exp);
             const dailyAttackTimes = getDailyAttackTimes(userLevel);
             const random1 = getRandomNum(8, 12) / 10;
@@ -189,8 +191,8 @@ export function attack(req, callback) {
                 userInfo.force * random2 + userInfo.agility * 0.1 > targetInfo.defence * random3 + targetInfo.agility * 0.1
             ) {
                 isSuccess = 1;
-                const randomCoins = getRandomNum(1, 5);
-                gainCoins = targetInfo.coin <= 10 ? 0 : randomCoins;
+                const randomCoins = getRandomNum(1, 3);
+                gainCoins = (targetInfo.coin <= 10 || targetGetAttackedTimes > 0) ? 0 : randomCoins;
             }
 
             connection.beginTransaction((err) => {
@@ -216,7 +218,7 @@ export function attack(req, callback) {
                             return rollbackHandler(connection, err, 'attackOpError', callback);
                         }
 
-                        callback({ code: codes.ok, gainCoins, isSuccess });
+                        callback({ code: codes.ok, gainCoins, isSuccess, targetGetAttackedTimes });
                     });
                 });
             });

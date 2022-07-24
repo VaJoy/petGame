@@ -85,7 +85,8 @@ export default {
             }
             
             let msg = data.isSuccess === 0 ? '你的宝宝还不够强大，没打赢对方 :(' : 
-            ('攻击成功，' + (data.gainCoins > 0 ? `从${name}身上抢走了 ${data.gainCoins} 金币` : `但${name}实在太穷了，你没有抢到金币`));
+            ('攻击成功，' + (data.gainCoins > 0 ? `从${name}身上抢走了 ${data.gainCoins} 金币` : 
+            (data.targetGetAttackedTimes > 0 ? `但${name}今天被别人殴打过了，你大发慈悲没有再抢 TA 的金币` : `但${name}实在太穷了，你没有抢到金币`)));
             emitter.emit('request/reload');
 
             emitter.emit('dialog/alert', msg);
