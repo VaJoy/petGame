@@ -493,7 +493,7 @@ export function getInitData(req, callback) {
 
     const getEvents = new Promise((resolve, reject) => {
         connection.query(`SELECT a.*, b.name as award_name, b.num as award_num from events a left join awards b on a.id=b.event_id 
-        where a.success=1 order by a.c_time DESC LIMIT 10`, function (error, results) {
+        where a.success=1 or a.type=${eventType.attack} order by a.c_time DESC LIMIT 10`, function (error, results) {
             if (error) {
                 return reject(error);
             }
@@ -503,7 +503,7 @@ export function getInitData(req, callback) {
 
     const getMyEvents = new Promise((resolve, reject) => {
         connection.query(`SELECT a.*, b.name as award_name, b.num as award_num from events a left join awards b on a.id=b.event_id
-        where (a.user_id=${user_id | 0} or a.target_id=${user_id | 0}) and a.success=1 order by a.c_time DESC LIMIT 10`,
+        where (a.user_id=${user_id | 0} or a.target_id=${user_id | 0}) and (a.success=1 or a.type=${eventType.attack}) order by a.c_time DESC LIMIT 10`,
             function (error, results) {
                 if (error) {
                     return reject(error);

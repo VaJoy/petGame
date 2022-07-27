@@ -70,12 +70,13 @@ export default {
     },
     perfTitle() {
       return perf.value ? '关闭性能模式' : '开启性能模式';
+    },
+    level() {
+      return getLevel(this.pet.total_exp)
     }
   },
   setup(props) {
-
     return {
-      level: getLevel(props.pet.total_exp),
       togglePlane(name, state) {
         emitter.emit('index/toggle-plane-state', name, state)
       },
