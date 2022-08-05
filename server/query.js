@@ -25,7 +25,7 @@ export function checkLogin(req, needAdmin, next) {
     connection.query(`SELECT * from users where session_id="${sqlFilter(req.session.id)}" and id=${needAdmin ? adminId : req.session.user_id | 0}`,
         function (error, results) {
             if (!error && results?.length) {
-                next();
+                next(null, results[0]);
             } else {
                 next('你没有权限操作，请重新登录');
                 req.session.destroy(() => { });
@@ -232,12 +232,13 @@ export function endWorking(req, callback) {
     const userId = session.user_id | 0;
     const workType = body?.workType | 0;
     const today = moment().format('yyyy-MM-DD');
-    checkLogin(req, false, (error) => {
+    checkLogin(req, false, (error, userInfo) => {
         if (errorHandler(error, 'limitedAccess', callback)) {
             return;
         }
 
-        connection.query(`SELECT id,c_time,c_date,success from events where user_id=${userId} and type=${eventType.startWorking} order by c_time desc limit 1;SELECT id,c_time,c_date,success from events where user_id=${userId} and type=${eventType.startWorking} and success=1 order by c_time desc limit 1`,
+        connection.query(`SELECT id,c_time,c_date,success from events where user_id=${userId} and type=${eventType.startWorking} order by c_time desc limit 1;
+        SELECT id,c_time,c_date,success from events where user_id=${userId} and type=${eventType.startWorking} and success=1 order by c_time desc limit 1`,
             function (error, list) {
                 if (errorHandler(error, 'sqlNativeError', callback)) {
                     return;
@@ -259,9 +260,10 @@ export function endWorking(req, callback) {
                     return errorHandler('你的宝宝今天已经打工过了，无法再获得奖励', callback);
                 }
 
+                const level = getLevel(userInfo.exp + userInfo.sign_exp);
                 const timeSpan = Date.now() - c_time;
                 if (timeSpan > 60000 * 55 && timeSpan <= 60000 * 70) {
-                    const coins = getRandomNum(8, 13) + (workType === 1 ? 1 : 0);
+                    const coins = getRandomNum(level + 7, level + 12) + (workType === 1 ? 1 : 0);
                     connection.query(`update users set coin=(coin+${coins}) where id=${userId}; update events set success=1 where id=${id};
                     insert into awards (num, name, event_id) values (${coins}, '金币', ${id})`,
                         (err) => {
