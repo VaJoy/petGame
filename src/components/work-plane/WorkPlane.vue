@@ -3,9 +3,9 @@
     <div class="work-plane-wrap dialog-base">
       <h1>{{ title }}</h1>
       <p v-if="!isWorking && isShow">
-        宝宝每天可打工 1 小时，打工完毕可获得 <em>8 ~ 13</em> 随机金币的奖励（专注模式将额外多赚取 <em>1</em> 金币）。<br>
+        宝宝每天可打工 1 小时，打工完毕可获得 <em>8 ~ 13</em> 随机金币的奖励（每多 1 级可额外多赚取 <em>1</em> 金币）。<br>
       <ul>
-        <li>「专注模式打工」：打工过程不可刷新 / 关闭 / 隐藏打工页面。</li>
+        <li>「专注模式打工」：可额外多获取 1 金币，但打工过程不可刷新 / 关闭 / 隐藏打工页面。</li>
         <li>「普通模式打工」：打工过程可以隐藏打工页面，但不能刷新 / 关闭页面。</li>
       </ul><br>
       <span class="mr-30 button" @click.stop="clickStartToWork(1)">专注模式打工</span>

@@ -22,7 +22,7 @@ const connection = mysql.createConnection({
 connection.connect();
 
 export function checkLogin(req, needAdmin, next) {
-    connection.query(`SELECT * from users where session_id="${sqlFilter(req.session.id)}" and id=${needAdmin ? adminId : req.session.user_id | 0}`,
+    connection.query(`SELECT b.* from users a left join pets b on a.id=b.user_id where a.session_id="${sqlFilter(req.session.id)}" and a.id=${needAdmin ? adminId : req.session.user_id | 0}`,
         function (error, results) {
             if (!error && results?.length) {
                 next(null, results[0]);
