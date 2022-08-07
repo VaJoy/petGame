@@ -74,9 +74,9 @@ export default {
           return emitter.emit('dialog/alert', '宝宝 5 级后才能发动攻击哦。');
         }
 
-        if (total_exp < levels[2].exp) {
-          return emitter.emit('dialog/alert', '该宝宝还小，就别欺负它了。');
-        }
+        // if (total_exp < levels[2].exp) {
+        //   return emitter.emit('dialog/alert', '该宝宝还小，就别欺负它了。');
+        // }
 
         emitter.emit('dialog/confirm', `确定攻击${name}的宝宝么？`, () => {
           attack({ target: props.pet.user_id }, (data) => {
