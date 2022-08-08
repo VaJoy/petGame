@@ -1,8 +1,8 @@
 import { codes } from '@config/codes.js';
 import emitter from 'tiny-emitter/instance';
 import { isGithub } from '@js/util';
-const url = __IS_DEV__ ? 'http://localhost' : 'https://vajoy.icu';
-
+//const url = __IS_DEV__ ? 'http://localhost' : 'https://vajoy.icu';
+const url = '//' + location.hostname;
 
 export const request = (function () {
     const requestRecord = {};
